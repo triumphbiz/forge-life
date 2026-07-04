@@ -349,6 +349,22 @@
   .photo-date-thumbs .mini-thumb{width:36px; height:48px; border-radius:6px; background:#F5F0E9; overflow:hidden; border:1px solid var(--line);}
   .photo-date-thumbs .mini-thumb img{width:100%; height:100%; object-fit:cover;}
   .photo-date-label{font-size:13px; font-weight:600; color:var(--navy); width:90px; flex-shrink:0;}
+
+  /* Schedule */
+  .schedule-row{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line);}
+  .schedule-row:last-child{border-bottom:none;}
+  .schedule-date{font-size:13px; font-weight:600; color:var(--navy); width:88px; flex-shrink:0;}
+  .schedule-program{flex:1; font-size:13px; color:var(--text-soft);}
+  .schedule-status{font-size:11px; font-weight:600; padding:3px 9px; border-radius:10px; white-space:nowrap;}
+  .schedule-status.pending{background:rgba(255,165,0,0.15); color:#8a5c00;}
+  .schedule-status.done{background:rgba(46,125,50,0.15); color:#2E7D32;}
+  .schedule-status.missed{background:rgba(122,26,4,0.1); color:var(--red);}
+
+  /* Progression Charts */
+  #progWeightChart, #consistencyChart{width:100%; height:140px; display:block;}
+  .pr-chart-card{background:#FFFFFF; border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px;}
+  .pr-chart-title{font-size:13px; font-weight:600; color:var(--navy); margin-bottom:6px; display:flex; align-items:center; gap:8px;}
+  .pr-chart-card canvas{width:100%; height:120px; display:block;}
 </style>
 </head>
 <body>
@@ -388,6 +404,14 @@
         <div class="stat-label">Today's Workout</div>
         <div class="stat-sub" id="workoutSub">No session yet</div>
       </div>
+    </div>
+
+    <div class="card" id="todaysPlanCard" style="display:none;">
+      <div class="nutrition-head">
+        <div class="nutrition-head-left"><span class="emoji">📅</span><h3>Today's Plan</h3></div>
+        <button class="btn-small" id="btnStartTodaysPlan">Start</button>
+      </div>
+      <div class="mission-sub" id="todaysPlanText"></div>
     </div>
 
     <div class="card">
@@ -657,12 +681,50 @@
 
     <div id="moreSchedule" style="display:none;">
       <div class="back-row" data-back="schedule">‹ Back to More</div>
-      <div class="placeholder-view"><div class="icon">📅</div><h2>Schedule</h2><p>Coming in the next build pass.</p></div>
+      <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">Schedule</h2>
+
+      <div class="card">
+        <span class="card-label">Plan a Session</span>
+        <span class="field-label" style="margin-top:0;">Date</span>
+        <input type="date" class="text-input" id="scheduleDateInput">
+        <span class="field-label">Program</span>
+        <select class="text-input" id="scheduleProgramSelect"></select>
+        <button class="primary-btn" id="btnAddSchedule">Add to Schedule</button>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Upcoming</span>
+        <div id="scheduleUpcomingList"></div>
+        <div class="empty-note" id="scheduleUpcomingEmptyNote" style="display:none;">Nothing scheduled yet.</div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Past</span>
+        <div id="schedulePastList"></div>
+        <div class="empty-note" id="schedulePastEmptyNote" style="display:none;">No past scheduled sessions.</div>
+      </div>
     </div>
 
     <div id="moreProgression" style="display:none;">
       <div class="back-row" data-back="progression">‹ Back to More</div>
-      <div class="placeholder-view"><div class="icon">📈</div><h2>Progression Charts</h2><p>Coming in the next build pass.</p></div>
+      <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">Progression</h2>
+
+      <div class="card">
+        <span class="card-label">Weight Trend</span>
+        <canvas id="progWeightChart"></canvas>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Workout Consistency</span>
+        <canvas id="consistencyChart"></canvas>
+        <div class="mission-sub" style="margin-top:8px;">Sessions logged per week, last 8 weeks</div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">PR Progression</span>
+        <div id="prChartsContainer"></div>
+        <div class="empty-note" id="prChartsEmptyNote" style="display:none;">Log the same exercise across 2+ workouts to see a trend here.</div>
+      </div>
     </div>
 
   </section>
@@ -790,6 +852,7 @@
       workoutHistory: [], // {id,date,programName,startedAt,finishedAt,exercises:[...]}
       prs: {}, // exerciseNameLower -> best record
       progressPhotos: {}, // date -> {front,side,back} each a compressed data URL or null
+      schedule: {}, // date -> {programId, programName}
       streak: 0
     };
   }
@@ -961,6 +1024,8 @@
     document.getElementById('moreProgression').style.display = target === 'progression' ? 'block' : 'none';
     if(target === 'weight') renderWeightChart();
     if(target === 'photos') renderPhotosSection();
+    if(target === 'schedule') renderScheduleSection();
+    if(target === 'progression') renderProgressionSection();
   }
   document.querySelectorAll('.menu-item[data-target]').forEach(btn=>{
     btn.addEventListener('click', ()=> showMoreSection(btn.dataset.target));
@@ -981,6 +1046,16 @@
 
   // ---------- Dashboard render ----------
   function renderDashboard(){
+    const todaysEntry = state.schedule[todayStr()];
+    const todaysMission = getTodayMission();
+    const planCard = document.getElementById('todaysPlanCard');
+    if(todaysEntry && !todaysMission.workoutDone){
+      planCard.style.display = 'block';
+      document.getElementById('todaysPlanText').textContent = todaysEntry.programName + ' is scheduled for today';
+    } else {
+      planCard.style.display = 'none';
+    }
+
     const log = state.weightLog.slice().sort((a,b)=> a.date.localeCompare(b.date));
     const dashNum = document.getElementById('dashWeightNum');
     const dashSub = document.getElementById('dashWeightSub');
@@ -1686,6 +1761,263 @@
       });
     });
   }
+
+  // ================= PROGRESSION CHARTS =================
+  function drawLineChart(canvas, points, colorHex, unitSuffix){
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const H = 120;
+    canvas.width = rect.width * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width;
+    ctx.clearRect(0,0,W,H);
+
+    if(!points || points.length === 0){
+      ctx.fillStyle = '#9A938A';
+      ctx.font = '12px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('No data yet', W/2, H/2);
+      return;
+    }
+
+    const pad = 20;
+    const values = points.map(p=>p.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = (max - min) || 1;
+    const minAdj = min - range*0.15;
+    const maxAdj = max + range*0.15;
+    const rangeAdj = (maxAdj - minAdj) || 1;
+
+    ctx.strokeStyle = '#E7E0D3';
+    ctx.lineWidth = 1;
+    for(let i=0;i<=2;i++){
+      const y = pad + (H-pad*1.5) * (i/2);
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.strokeStyle = colorHex;
+    ctx.lineWidth = 2.5;
+    points.forEach((p,i)=>{
+      const x = points.length === 1 ? W/2 : pad + (W - pad*2) * (i/(points.length-1));
+      const y = pad + (H-pad*1.5) * (1 - (p.value - minAdj)/rangeAdj);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    points.forEach((p,i)=>{
+      const x = points.length === 1 ? W/2 : pad + (W - pad*2) * (i/(points.length-1));
+      const y = pad + (H-pad*1.5) * (1 - (p.value - minAdj)/rangeAdj);
+      ctx.beginPath(); ctx.arc(x,y,3.5,0,Math.PI*2); ctx.fillStyle = colorHex; ctx.fill();
+    });
+
+    const last = points[points.length-1];
+    ctx.fillStyle = colorHex;
+    ctx.font = 'bold 12px IBM Plex Mono';
+    ctx.textAlign = 'right';
+    ctx.fillText(last.value + (unitSuffix||''), W-4, 14);
+  }
+
+  function drawBarChart(canvas, bars, colorHex){
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const H = 120;
+    canvas.width = rect.width * dpr;
+    canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width;
+    ctx.clearRect(0,0,W,H);
+
+    const maxVal = Math.max(1, ...bars.map(b=>b.count));
+    const padBottom = 18, padTop = 14;
+    const gap = W / bars.length;
+    const barW = gap * 0.55;
+
+    bars.forEach((b,i)=>{
+      const barH = (H - padBottom - padTop) * (b.count / maxVal);
+      const x = gap*i + (gap-barW)/2;
+      const y = H - padBottom - barH;
+      ctx.fillStyle = colorHex;
+      ctx.fillRect(x, y, barW, Math.max(barH, 2));
+      ctx.fillStyle = '#6B6860';
+      ctx.font = '9px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText(b.label, x+barW/2, H-5);
+      if(b.count > 0){
+        ctx.fillStyle = '#2E3042';
+        ctx.font = 'bold 11px IBM Plex Mono';
+        ctx.fillText(b.count, x+barW/2, y-4);
+      }
+    });
+  }
+
+  function buildWeeklyConsistency(weeksBack){
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMonday = (day === 0 ? 6 : day - 1);
+    const currentMonday = new Date(now);
+    currentMonday.setDate(now.getDate() - diffToMonday);
+    const weeks = [];
+    for(let i=weeksBack-1;i>=0;i--){
+      const monday = new Date(currentMonday);
+      monday.setDate(currentMonday.getDate() - i*7);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate()+6);
+      const mondayStr = monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
+      const sundayStr = sunday.getFullYear()+'-'+String(sunday.getMonth()+1).padStart(2,'0')+'-'+String(sunday.getDate()).padStart(2,'0');
+      const count = state.workoutHistory.filter(s=> s.date >= mondayStr && s.date <= sundayStr).length;
+      weeks.push({ label: (monday.getMonth()+1)+'/'+monday.getDate(), count });
+    }
+    return weeks;
+  }
+
+  function buildExerciseSeries(){
+    const map = {};
+    state.workoutHistory.forEach(session=>{
+      session.exercises.forEach(ex=>{
+        const key = ex.name.trim().toLowerCase();
+        if(!key) return;
+        let value = null;
+        if(ex.type === 'strength' && ex.sets){
+          const maxW = ex.sets.reduce((m,s)=>{ const w = parseFloat(s.weightKg)||0; return w>m?w:m; }, 0);
+          if(maxW > 0) value = maxW;
+        } else if(ex.type === 'cardio' && ex.cardio){
+          const dur = parseFloat(ex.cardio.durationMin) || 0;
+          if(dur > 0) value = dur;
+        } else if(ex.type === 'core' && ex.sets){
+          const maxReps = ex.sets.reduce((m,s)=>{ const r = parseInt(s.reps,10)||0; return r>m?r:m; }, 0);
+          const maxHold = ex.sets.reduce((m,s)=>{ const h = parseInt(s.holdSec,10)||0; return h>m?h:m; }, 0);
+          value = maxReps > 0 ? maxReps : (maxHold > 0 ? maxHold : null);
+        }
+        if(value === null) return;
+        if(!map[key]) map[key] = { name: ex.name, type: ex.type, byDate: {} };
+        if(!map[key].byDate[session.date] || value > map[key].byDate[session.date]){
+          map[key].byDate[session.date] = value;
+        }
+      });
+    });
+    const result = [];
+    Object.values(map).forEach(entry=>{
+      const points = Object.keys(entry.byDate).sort().map(d=>({ date:d, value: entry.byDate[d] }));
+      if(points.length >= 2) result.push({ name: entry.name, type: entry.type, points });
+    });
+    return result;
+  }
+
+  function renderProgressionSection(){
+    const wPoints = state.weightLog.slice().sort((a,b)=> a.date.localeCompare(b.date)).map(e=>({date:e.date, value:e.kg}));
+    drawLineChart(document.getElementById('progWeightChart'), wPoints, '#7A1A04', 'kg');
+
+    drawBarChart(document.getElementById('consistencyChart'), buildWeeklyConsistency(8), '#BB7A29');
+
+    const series = buildExerciseSeries();
+    const container = document.getElementById('prChartsContainer');
+    const emptyNote = document.getElementById('prChartsEmptyNote');
+    if(series.length === 0){
+      emptyNote.style.display = 'block';
+      container.innerHTML = '';
+      return;
+    }
+    emptyNote.style.display = 'none';
+    container.innerHTML = series.map(s=>{
+      const safeKey = s.name.toLowerCase().replace(/[^a-z0-9]/g,'_');
+      return '<div class="pr-chart-card"><div class="pr-chart-title">'+s.name+' <span class="type-chip '+s.type+'">'+s.type+'</span></div><canvas id="prchart-'+safeKey+'"></canvas></div>';
+    }).join('');
+    series.forEach(s=>{
+      const safeKey = s.name.toLowerCase().replace(/[^a-z0-9]/g,'_');
+      const canvas = document.getElementById('prchart-'+safeKey);
+      const unit = s.type === 'strength' ? 'kg' : (s.type === 'cardio' ? ' min' : '');
+      drawLineChart(canvas, s.points, '#2E3042', unit);
+    });
+  }
+
+  // ================= SCHEDULE =================
+  document.getElementById('scheduleDateInput').valueAsDate = new Date();
+
+  function populateScheduleProgramSelect(){
+    const sel = document.getElementById('scheduleProgramSelect');
+    const options = ['<option value="">Freestyle</option>']
+      .concat(state.programs.map(p=> '<option value="'+p.id+'">'+p.name+'</option>'));
+    sel.innerHTML = options.join('');
+  }
+
+  document.getElementById('btnAddSchedule').addEventListener('click', ()=>{
+    const date = document.getElementById('scheduleDateInput').value;
+    if(!date){ alert('Pick a date.'); return; }
+    const progId = document.getElementById('scheduleProgramSelect').value;
+    const prog = progId ? state.programs.find(p=>p.id === progId) : null;
+    state.schedule[date] = { programId: prog ? prog.id : null, programName: prog ? prog.name : 'Freestyle Workout' };
+    save();
+    renderScheduleSection();
+    renderDashboard();
+  });
+
+  function scheduleStatusFor(date, entry){
+    const hasWorkout = state.workoutHistory.some(s=> s.date === date);
+    if(hasWorkout) return 'done';
+    if(date < todayStr()) return 'missed';
+    return 'pending';
+  }
+
+  function renderScheduleLists(){
+    const dates = Object.keys(state.schedule).sort();
+    const today = todayStr();
+    const upcoming = dates.filter(d=> d >= today);
+    const past = dates.filter(d=> d < today);
+
+    function buildRows(dateList){
+      return dateList.map(d=>{
+        const entry = state.schedule[d];
+        const status = scheduleStatusFor(d, entry);
+        return '<div class="schedule-row">'
+          + '<span class="schedule-date">'+d+'</span>'
+          + '<span class="schedule-program">'+entry.programName+'</span>'
+          + '<span class="schedule-status '+status+'">'+status+'</span>'
+          + '<button class="set-del" data-remove-schedule="'+d+'">✕</button>'
+        + '</div>';
+      }).join('');
+    }
+
+    const upcomingList = document.getElementById('scheduleUpcomingList');
+    const upcomingEmpty = document.getElementById('scheduleUpcomingEmptyNote');
+    if(upcoming.length === 0){ upcomingEmpty.style.display = 'block'; upcomingList.innerHTML = ''; }
+    else { upcomingEmpty.style.display = 'none'; upcomingList.innerHTML = buildRows(upcoming); }
+
+    const pastList = document.getElementById('schedulePastList');
+    const pastEmpty = document.getElementById('schedulePastEmptyNote');
+    const pastSorted = past.slice().sort().reverse();
+    if(pastSorted.length === 0){ pastEmpty.style.display = 'block'; pastList.innerHTML = ''; }
+    else { pastEmpty.style.display = 'none'; pastList.innerHTML = buildRows(pastSorted); }
+
+    document.querySelectorAll('[data-remove-schedule]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        delete state.schedule[btn.dataset.removeSchedule];
+        save();
+        renderScheduleSection();
+        renderDashboard();
+      });
+    });
+  }
+
+  function renderScheduleSection(){
+    populateScheduleProgramSelect();
+    renderScheduleLists();
+  }
+
+  document.getElementById('btnStartTodaysPlan').addEventListener('click', ()=>{
+    const entry = state.schedule[todayStr()];
+    if(!entry) return;
+    const prog = entry.programId ? state.programs.find(p=>p.id === entry.programId) : null;
+    tabButtons.forEach(b=>b.classList.remove('active'));
+    document.querySelector('nav.tabbar button[data-view="workouts"]').classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-workouts').classList.add('active');
+    startSession(prog);
+  });
 
   // ================= PROGRESS PHOTOS =================
   const PHOTO_ANGLES = ['front','side','back'];
