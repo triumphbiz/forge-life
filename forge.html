@@ -1,0 +1,2056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Forge Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F0E9;
+    --card:#FFFFFF;
+    --line:#E7E0D3;
+    --navy:#2E3042;
+    --red:#7A1A04;
+    --amber:#FFA500;
+    --bronze:#BB7A29;
+    --charcoal:#333332;
+    --text-soft:#6B6860;
+    --grad: linear-gradient(135deg, #2E3042 0%, #2E3042 45%, #4A4340 60%, #6A5640 72%, #8F6330 84%, #BB7A29 100%);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--navy);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:84px;
+    min-height:100vh;
+  }
+  h1,h2,h3,.display{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  header{
+    padding:20px 20px 22px;
+    background:var(--grad);
+    position:sticky;
+    top:0;
+    z-index:10;
+    box-shadow:0 2px 10px rgba(46,48,66,0.15);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.16);
+    border:1px solid rgba(255,255,255,0.4);
+    border-radius:8px;
+    font-family:'Oswald',sans-serif;
+    font-weight:700;
+    font-size:18px;
+    color:#FFFFFF;
+  }
+  .brand h1{font-size:20px; margin:0; color:#FFFFFF; font-weight:600;}
+  .brand span{color:var(--amber);}
+  .header-day{color:rgba(245,240,233,0.85); font-size:13px; font-weight:500;}
+
+  main{padding:16px 16px 8px; max-width:520px; margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .greeting{font-size:19px; font-weight:700; color:var(--navy); margin:2px 0 2px;}
+  .greeting-date{font-size:13px; color:var(--bronze); font-weight:600; margin-bottom:14px;}
+
+  .card{
+    background:var(--card);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:14px;
+    box-shadow:0 2px 10px rgba(46,48,66,0.06);
+  }
+  .card-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.09em;
+    color:var(--text-soft);
+    margin-bottom:8px;
+    display:block;
+    font-weight:600;
+  }
+
+  /* Weight hero gradient card */
+  .weight-hero-card{
+    background:var(--grad);
+    border-radius:14px;
+    padding:18px 18px 16px;
+    margin-bottom:14px;
+    color:#FFFFFF;
+  }
+  .weight-hero-card .card-label{color:rgba(245,240,233,0.8);}
+  .weight-number{
+    font-family:'Oswald',sans-serif;
+    font-size:42px;
+    font-weight:600;
+    color:#FFFFFF;
+    line-height:1;
+  }
+  .weight-number small{font-size:17px; color:rgba(245,240,233,0.85); font-weight:400;}
+  .weight-sub{font-size:12px; color:rgba(245,240,233,0.8); margin-top:6px;}
+
+  /* Two-up stat cards */
+  .stat-row{display:flex; gap:12px; margin-bottom:14px;}
+  .stat-card{flex:1;}
+  .stat-icon{font-size:26px; margin-bottom:8px;}
+  .stat-value{font-family:'Oswald',sans-serif; font-size:26px; font-weight:600; color:var(--navy);}
+  .stat-label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-soft); font-weight:600; margin-top:4px;}
+  .stat-sub{font-size:12px; color:var(--text-soft); margin-top:4px;}
+
+  /* Nutrition summary card */
+  .nutrition-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .nutrition-head-left{display:flex; align-items:center; gap:8px;}
+  .nutrition-head-left .emoji{font-size:20px;}
+  .nutrition-head h3{font-size:16px; text-transform:none; letter-spacing:0; margin:0; color:var(--navy); font-family:'Inter',sans-serif; font-weight:700;}
+  .btn-small{
+    background:var(--red);
+    color:#FFFFFF;
+    border:none;
+    border-radius:8px;
+    padding:9px 16px;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .cal-row{display:flex; justify-content:space-between; font-size:13px; color:var(--text-soft); margin-bottom:6px;}
+  .cal-row strong{color:var(--navy); font-family:'IBM Plex Mono',monospace;}
+  .progress-track{height:8px; background:#F0EAE0; border-radius:5px; overflow:hidden; margin-bottom:14px;}
+  .progress-fill{height:100%; background:var(--red); border-radius:5px; transition:width .2s ease;}
+  .macro-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .macro-box{background:#F7F3EC; border-radius:10px; padding:10px 6px; text-align:center;}
+  .macro-box .m-val{font-family:'Oswald',sans-serif; font-size:18px; font-weight:600; color:var(--navy);}
+  .macro-box .m-label{font-size:10px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-soft); margin-top:2px;}
+  .macro-box .m-bar{height:3px; background:var(--line); border-radius:2px; margin-top:6px; overflow:hidden;}
+  .macro-box .m-bar-fill{height:100%; background:var(--bronze);}
+
+  .mission-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
+  .streak-badge{
+    display:flex; align-items:center; gap:6px;
+    background:var(--amber); color:#FFFFFF;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px;
+    padding:5px 10px; border-radius:20px;
+  }
+  .mission-row{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line);}
+  .mission-row:last-child{border-bottom:none; padding-bottom:0;}
+  .mission-check{
+    width:26px;height:26px; border-radius:6px; border:2px solid var(--line);
+    flex-shrink:0; display:flex;align-items:center;justify-content:center;
+    cursor:pointer; font-size:14px; color:transparent; transition:all .15s ease;
+  }
+  .mission-check.done{background:#2E7D32; border-color:#2E7D32; color:#FFFFFF;}
+  .mission-check.readonly{cursor:default;}
+  .mission-body{flex:1; min-width:0;}
+  .mission-title{font-size:14px; font-weight:600; color:var(--navy);}
+  .mission-sub{font-size:12px; color:var(--text-soft); margin-top:2px;}
+  .mission-input{
+    width:64px; background:#F5F0E9; border:1px solid var(--line); border-radius:6px;
+    color:var(--navy); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:5px 6px; text-align:right;
+  }
+  .mission-adjust{
+    background:#F5F0E9; border:1px solid var(--line); color:var(--text-soft);
+    border-radius:6px; width:26px; height:26px; font-size:14px; cursor:pointer;
+  }
+  .water-track{display:flex; gap:4px; margin-top:8px;}
+  .water-drop{flex:1; height:20px; border-radius:4px; background:#EFE9DC; cursor:pointer; border:none; padding:0;}
+  .water-drop.filled{background:linear-gradient(180deg, #5FA8D3, #2E7DB0);}
+  .water-drop:active{opacity:0.7;}
+
+  .chart-wrap{background:var(--card); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:0 2px 10px rgba(46,48,66,0.06);}
+  #weightChart{width:100%; height:180px; display:block;}
+  .log-list{list-style:none; margin:0; padding:0;}
+  .log-list li{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px;}
+  .log-list li:last-child{border-bottom:none;}
+  .log-list .l-date{color:var(--text-soft);}
+  .log-list .l-val{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--navy);}
+  .log-list .l-del{color:var(--red); background:none; border:none; cursor:pointer; font-size:12px; font-weight:600;}
+  .food-list li{align-items:flex-start;}
+  .food-name{font-weight:600; color:var(--navy); display:block;}
+  .food-macros{font-size:12px; color:var(--text-soft); font-family:'IBM Plex Mono',monospace;}
+
+  .empty-note{text-align:center; color:var(--text-soft); font-size:13px; padding:30px 10px;}
+
+  .placeholder-view{text-align:center; padding:60px 20px; color:var(--text-soft);}
+  .placeholder-view .icon{font-size:36px; margin-bottom:10px;}
+  .placeholder-view h2{color:var(--navy); font-size:20px; margin-bottom:6px;}
+
+  .toggle-pill{width:44px; height:24px; border-radius:14px; background:var(--line); position:relative; cursor:pointer; transition:background .15s ease; flex-shrink:0;}
+  .toggle-pill.on{background:var(--red);}
+  .toggle-pill::after{content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#FFFFFF; transition:left .15s ease; box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+  .toggle-pill.on::after{left:22px;}
+
+  .modal-backdrop{position:fixed; inset:0; background:rgba(46,48,66,.5); display:none; align-items:flex-end; justify-content:center; z-index:100;}
+  .modal-backdrop.open{display:flex;}
+  .modal{background:var(--card); border-radius:16px 16px 0 0; padding:20px; width:100%; max-width:520px; max-height:85vh; overflow-y:auto;}
+  .modal h3{margin:0 0 14px; font-size:18px; color:var(--navy);}
+  .modal input{
+    width:100%; background:#F5F0E9; border:1px solid var(--line); border-radius:8px;
+    color:var(--navy); font-family:'IBM Plex Mono',monospace; font-size:18px; padding:10px; margin-bottom:12px; text-align:center;
+  }
+  .modal label{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-soft); font-weight:600; display:block; margin-bottom:4px;}
+  .field-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .modal-actions{display:flex; gap:10px; margin-top:6px;}
+  .modal-actions button{flex:1; padding:12px; border-radius:8px; font-weight:600; font-family:'Inter',sans-serif; font-size:14px; cursor:pointer; border:none;}
+  .btn-cancel{background:#F5F0E9; color:var(--text-soft); border:1px solid var(--line) !important;}
+  .btn-save{background:var(--red); color:#FFFFFF;}
+
+  .more-menu{list-style:none; margin:0; padding:0;}
+  .more-menu li{border-bottom:1px solid var(--line);}
+  .more-menu li:last-child{border-bottom:none;}
+  .more-menu button.menu-item{
+    width:100%; background:none; border:none; display:flex; align-items:center; gap:12px;
+    padding:14px 2px; cursor:pointer; text-align:left; font-family:'Inter',sans-serif;
+  }
+  .menu-item .menu-icon{font-size:20px; width:26px; text-align:center;}
+  .menu-item .menu-title{font-size:15px; font-weight:600; color:var(--navy); flex:1;}
+  .menu-item .menu-chevron{color:var(--text-soft); font-size:16px;}
+  .back-row{display:flex; align-items:center; gap:8px; margin-bottom:14px; cursor:pointer; color:var(--text-soft); font-size:14px; font-weight:600;}
+
+  nav.tabbar{
+    position:fixed; bottom:0; left:0; right:0; background:#FFFFFF; border-top:1px solid var(--line);
+    display:flex; z-index:10; padding:10px 8px calc(8px + env(safe-area-inset-bottom));
+    box-shadow:0 -2px 10px rgba(46,48,66,0.06); gap:6px;
+  }
+  nav.tabbar button{
+    flex:1; background:none; border:none; color:var(--text-soft); font-family:'Inter',sans-serif;
+    font-size:10px; padding:0; display:flex; flex-direction:column; align-items:center; gap:5px;
+    cursor:pointer; letter-spacing:0.02em;
+  }
+  nav.tabbar .tab-icon{
+    width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center;
+    font-size:18px; color:var(--text-soft); background:transparent; transition:all .15s ease;
+  }
+  nav.tabbar button.active{color:var(--navy); font-weight:600;}
+  nav.tabbar button[data-view="dashboard"] .tab-icon{background:rgba(46,48,66,0.12); color:var(--navy);}
+  nav.tabbar button[data-view="nutrition"] .tab-icon{background:rgba(122,26,4,0.10); color:var(--red);}
+  nav.tabbar button[data-view="workouts"] .tab-icon{background:rgba(255,165,0,0.15); color:var(--amber);}
+  nav.tabbar button[data-view="history"] .tab-icon{background:rgba(187,122,41,0.15); color:var(--bronze);}
+  nav.tabbar button[data-view="more"] .tab-icon{background:rgba(51,51,50,0.12); color:var(--charcoal);}
+  nav.tabbar button[data-view="dashboard"].active .tab-icon{background:var(--navy); color:#FFFFFF;}
+  nav.tabbar button[data-view="nutrition"].active .tab-icon{background:var(--red); color:#FFFFFF;}
+  nav.tabbar button[data-view="workouts"].active .tab-icon{background:var(--amber); color:#FFFFFF;}
+  nav.tabbar button[data-view="history"].active .tab-icon{background:var(--bronze); color:#FFFFFF;}
+  nav.tabbar button[data-view="more"].active .tab-icon{background:var(--charcoal); color:#FFFFFF;}
+
+  /* Nutrition stats setup + meal library */
+  .setup-intro{font-size:13px; color:var(--text-soft); line-height:1.6; margin-bottom:12px;}
+  .field-label{font-size:12px; font-weight:600; color:var(--navy); margin:12px 0 6px; display:block;}
+  .field-label:first-of-type{margin-top:0;}
+  .text-input{
+    width:100%; background:#F5F0E9; border:1px solid var(--line); border-radius:8px;
+    color:var(--navy); font-family:'IBM Plex Mono',monospace; font-size:16px; padding:10px 12px;
+  }
+  .segmented{display:flex; gap:6px; flex-wrap:wrap;}
+  .seg-btn{
+    flex:1; min-width:70px; background:#F5F0E9; border:1px solid var(--line); border-radius:8px;
+    padding:9px 6px; font-family:'Inter',sans-serif; font-size:12px; font-weight:600; color:var(--text-soft); cursor:pointer;
+  }
+  .seg-btn.active{background:var(--navy); color:#FFFFFF; border-color:var(--navy);}
+  .primary-btn{
+    width:100%; background:var(--red); color:#FFFFFF; border:none; border-radius:8px;
+    padding:12px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; cursor:pointer; margin-top:14px;
+  }
+  .link-btn{background:none; border:none; color:var(--red); font-size:12px; font-weight:600; cursor:pointer; padding:0;}
+  .source-tabs{display:flex; gap:8px; margin:4px 0 10px;}
+  .source-tab{
+    flex:1; padding:9px; border-radius:8px; border:1px solid var(--line); background:#F5F0E9;
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13px; color:var(--text-soft); cursor:pointer;
+  }
+  .source-tab.active{background:var(--navy); color:#FFFFFF; border-color:var(--navy);}
+  .cat-chips{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;}
+  .cat-chip{padding:6px 12px; border-radius:20px; border:1px solid var(--line); background:#FFFFFF; font-size:12px; font-weight:600; color:var(--text-soft); cursor:pointer;}
+  .cat-chip.active{background:var(--amber); color:#FFFFFF; border-color:var(--amber);}
+  .recipe-card{background:#FFFFFF; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden;}
+  .recipe-head{padding:12px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .recipe-name{font-size:14px; font-weight:600; color:var(--navy);}
+  .recipe-macropills{display:flex; gap:6px; margin-top:6px; flex-wrap:wrap;}
+  .recipe-pill{font-size:10px; font-weight:600; padding:2px 7px; border-radius:10px; background:#F5F0E9; color:var(--text-soft);}
+  .recipe-chevron{color:var(--text-soft); font-size:14px; flex-shrink:0;}
+  .recipe-detail{display:none; padding:0 14px 14px; font-size:13px; color:var(--text-soft); line-height:1.6;}
+  .recipe-detail.open{display:block;}
+  .recipe-detail h4{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--bronze); margin:10px 0 6px;}
+  .recipe-detail ul{margin:0; padding-left:18px;}
+  .recipe-detail .recipe-note{background:#F5F0E9; border-radius:8px; padding:8px 10px; margin-top:8px; font-size:12px;}
+  .log-this-btn{width:100%; background:var(--red); color:#FFFFFF; border:none; border-radius:8px; padding:9px; font-weight:600; font-size:13px; cursor:pointer; margin-top:10px;}
+
+  /* Workouts / Programs / Sessions / History */
+  .type-chip{font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; text-transform:uppercase; letter-spacing:0.04em;}
+  .type-chip.strength{background:rgba(122,26,4,0.12); color:var(--red);}
+  .type-chip.cardio{background:rgba(255,165,0,0.18); color:#8a5c00;}
+  .type-chip.core{background:rgba(187,122,41,0.18); color:var(--bronze);}
+  .program-card{background:#FFFFFF; border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:10px;}
+  .program-card-head{display:flex; justify-content:space-between; align-items:center; gap:8px;}
+  .program-name{font-size:14px; font-weight:600; color:var(--navy);}
+  .program-sub{font-size:12px; color:var(--text-soft); margin-top:3px;}
+  .start-btn{background:var(--navy); color:#FFFFFF; border:none; border-radius:8px; padding:8px 14px; font-weight:600; font-size:12px; cursor:pointer; white-space:nowrap;}
+  .session-banner{background:var(--amber); color:#FFFFFF; border-radius:10px; padding:12px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  .session-banner span{font-size:13px; font-weight:600;}
+  .session-banner button{background:rgba(255,255,255,0.25); color:#FFFFFF; border:none; border-radius:6px; padding:7px 12px; font-weight:600; font-size:12px; cursor:pointer;}
+  .exercise-card{background:#FFFFFF; border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:10px;}
+  .exercise-card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:10px;}
+  .exercise-name{font-size:14px; font-weight:600; color:var(--navy);}
+  .set-row{display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--line);}
+  .set-row:last-of-type{border-bottom:none;}
+  .set-num{font-size:11px; color:var(--text-soft); width:20px; flex-shrink:0;}
+  .set-input{width:100%; background:#F5F0E9; border:1px solid var(--line); border-radius:6px; color:var(--navy); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:6px 8px; text-align:center;}
+  .set-del{background:none; border:none; color:var(--red); font-size:12px; cursor:pointer; flex-shrink:0;}
+  .add-set-btn{background:#F5F0E9; color:var(--navy); border:1px solid var(--line); border-radius:6px; padding:7px; font-size:12px; font-weight:600; cursor:pointer; width:100%; margin-top:6px;}
+  .exercise-notes{width:100%; background:#F5F0E9; border:1px solid var(--line); border-radius:6px; color:var(--navy); font-family:'Inter',sans-serif; font-size:12px; padding:7px 8px; margin-top:8px; resize:vertical; min-height:36px;}
+  .remove-exercise-btn{background:none; border:none; color:var(--red); font-size:11px; font-weight:600; cursor:pointer;}
+  .finish-actions{display:flex; gap:10px; margin-top:6px;}
+  .finish-actions button{flex:1;}
+  .discard-btn{background:#F5F0E9; color:var(--red); border:1px solid var(--line); border-radius:8px; padding:12px; font-weight:600; font-size:14px; cursor:pointer;}
+  .pr-grid{display:grid; grid-template-columns:1fr; gap:8px;}
+  .pr-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--line);}
+  .pr-row:last-child{border-bottom:none;}
+  .pr-row .pr-name{font-size:13px; font-weight:600; color:var(--navy);}
+  .pr-row .pr-value{font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--bronze); font-size:14px;}
+  .history-card{background:#FFFFFF; border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden;}
+  .history-head{padding:12px 14px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
+  .history-title{font-size:14px; font-weight:600; color:var(--navy);}
+  .history-sub{font-size:12px; color:var(--text-soft); margin-top:2px;}
+  .history-detail{display:none; padding:0 14px 14px; font-size:13px; color:var(--text-soft);}
+  .history-detail.open{display:block;}
+  .history-detail .ex-line{padding:6px 0; border-bottom:1px solid var(--line);}
+  .history-detail .ex-line:last-child{border-bottom:none;}
+
+  /* Progress Photos */
+  .photo-slots{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px;}
+  .photo-slot{aspect-ratio:3/4; border-radius:10px; border:1px dashed var(--line); background:#F5F0E9; position:relative; overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .photo-slot img{width:100%; height:100%; object-fit:cover;}
+  .photo-slot .slot-label{position:absolute; top:6px; left:6px; font-size:10px; font-weight:600; background:rgba(46,48,66,0.75); color:#FFFFFF; padding:2px 7px; border-radius:8px; text-transform:uppercase; letter-spacing:0.04em;}
+  .photo-slot .slot-placeholder{font-size:24px; color:var(--text-soft);}
+  .photo-slot .slot-remove{position:absolute; bottom:6px; right:6px; background:rgba(122,26,4,0.85); color:#FFFFFF; border:none; border-radius:6px; font-size:10px; font-weight:600; padding:3px 7px; cursor:pointer;}
+  .compare-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .compare-col{display:flex; flex-direction:column;}
+  .compare-photo{aspect-ratio:3/4; border-radius:10px; background:#F5F0E9; border:1px solid var(--line); margin-top:8px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .compare-photo img{width:100%; height:100%; object-fit:cover;}
+  .photo-date-row{display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--line);}
+  .photo-date-row:last-child{border-bottom:none;}
+  .photo-date-thumbs{display:flex; gap:6px; flex:1;}
+  .photo-date-thumbs .mini-thumb{width:36px; height:48px; border-radius:6px; background:#F5F0E9; overflow:hidden; border:1px solid var(--line);}
+  .photo-date-thumbs .mini-thumb img{width:100%; height:100%; object-fit:cover;}
+  .photo-date-label{font-size:13px; font-weight:600; color:var(--navy); width:90px; flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-mark">F</div>
+    <h1>FORGE <span>LIFE</span></h1>
+  </div>
+  <div class="header-day" id="headerDay"></div>
+</header>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="view-dashboard">
+
+    <div class="greeting" id="greetingText">Good day 💪</div>
+    <div class="greeting-date" id="greetingDate"></div>
+
+    <div class="weight-hero-card">
+      <span class="card-label">Current Body Weight</span>
+      <div class="weight-number" id="dashWeightNum">-- <small>kg</small></div>
+      <div class="weight-sub" id="dashWeightSub">No weigh-ins logged yet</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="card stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value" id="streakCount">0</div>
+        <div class="stat-label">Day Streak</div>
+        <div class="stat-sub" id="sessionsThisWeek">0 sessions this week</div>
+      </div>
+      <div class="card stat-card">
+        <div class="stat-icon" id="workoutIcon">🏋️</div>
+        <div class="stat-value" id="workoutStatus" style="font-size:17px;">Rest day</div>
+        <div class="stat-label">Today's Workout</div>
+        <div class="stat-sub" id="workoutSub">No session yet</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="nutrition-head">
+        <div class="nutrition-head-left"><span class="emoji">🥗</span><h3>Today's Nutrition</h3></div>
+        <button class="btn-small" id="btnLogFoodDash">Log food</button>
+      </div>
+      <div class="cal-row"><span>Calories</span><strong><span id="calProgress">0</span> / <span id="calTarget">2000</span> kcal</strong></div>
+      <div class="progress-track"><div class="progress-fill" id="calFill" style="width:0%;"></div></div>
+      <div class="macro-grid">
+        <div class="macro-box"><div class="m-val" id="proteinVal">0g</div><div class="m-label">Protein</div><div class="m-bar"><div class="m-bar-fill" id="proteinBar" style="width:0%;"></div></div></div>
+        <div class="macro-box"><div class="m-val" id="carbsVal">0g</div><div class="m-label">Carbs</div><div class="m-bar"><div class="m-bar-fill" id="carbsBar" style="width:0%;"></div></div></div>
+        <div class="macro-box"><div class="m-val" id="fatVal">0g</div><div class="m-label">Fat</div><div class="m-bar"><div class="m-bar-fill" id="fatBar" style="width:0%;"></div></div></div>
+        <div class="macro-box"><div class="m-val" id="fibreVal">0g</div><div class="m-label">Fibre</div><div class="m-bar"><div class="m-bar-fill" id="fibreBar" style="width:0%;"></div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="nutrition-head">
+        <div class="nutrition-head-left"><span class="emoji">🎯</span><h3>Daily Mission</h3></div>
+        <div class="streak-badge">🔥 <span id="streakCount">0</span> day streak</div>
+      </div>
+
+      <div class="mission-row">
+        <div class="mission-check" id="checkSteps">✓</div>
+        <div class="mission-body">
+          <div class="mission-title">Steps</div>
+          <div class="mission-sub"><span id="stepsProgress">0</span> / <span id="stepsTargetLabel">8000</span></div>
+        </div>
+        <button class="mission-adjust" id="editStepsTarget">✎</button>
+        <input type="number" class="mission-input" id="stepsInput" placeholder="0">
+      </div>
+
+      <div class="mission-row">
+        <div class="mission-check" id="checkWorkout">✓</div>
+        <div class="mission-body">
+          <div class="mission-title">Workout</div>
+          <div class="mission-sub">Tap to mark done</div>
+        </div>
+      </div>
+
+      <div class="mission-row" style="align-items:flex-start;">
+        <div class="mission-check" id="checkWater" style="margin-top:2px;">✓</div>
+        <div class="mission-body">
+          <div class="mission-title">Water — 3L</div>
+          <div class="mission-sub"><span id="waterProgress">0.0</span>L today &middot; tap a bar to set your level</div>
+          <div class="water-track" id="waterTrack"></div>
+        </div>
+      </div>
+
+      <div class="mission-row">
+        <div class="mission-check readonly" id="checkProtein">✓</div>
+        <div class="mission-body">
+          <div class="mission-title">Protein</div>
+          <div class="mission-sub"><span id="proteinMissionProgress">0</span>g / <span id="proteinTargetLabel">150</span>g &middot; auto from Nutrition</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card">
+      <span class="card-label">Keto Mode</span>
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div class="mission-sub" style="font-size:13px;">Switches macro targets to low-carb / high-fat</div>
+        <div class="toggle-pill" id="ketoToggle"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- NUTRITION -->
+  <section class="view" id="view-nutrition">
+    <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">Nutrition</h2>
+
+    <div class="source-tabs" id="nutritionSubnav">
+      <button class="source-tab active" data-sub="log">Log</button>
+      <button class="source-tab" data-sub="library">Library</button>
+    </div>
+
+    <div id="nutritionLogView">
+
+      <div class="card" id="statsSetupCard">
+        <span class="card-label">Set Up Your Targets</span>
+        <p class="setup-intro">This works out a starting point for calories, protein, carbs and fat from your stats. It's a solid estimate, not a medical calculation — every number is editable after.</p>
+        <span class="field-label">Current weight (kg)</span>
+        <input type="number" step="0.1" class="text-input" id="setupWeight" placeholder="e.g. 115">
+        <span class="field-label">Goal weight (kg)</span>
+        <input type="number" step="0.1" class="text-input" id="setupGoalWeight" placeholder="e.g. 95">
+        <span class="field-label">Activity level</span>
+        <div class="segmented" id="setupActivity">
+          <button type="button" class="seg-btn" data-level="sedentary">Sedentary</button>
+          <button type="button" class="seg-btn" data-level="light">Light</button>
+          <button type="button" class="seg-btn active" data-level="moderate">Moderate</button>
+          <button type="button" class="seg-btn" data-level="active">Active</button>
+        </div>
+        <button class="primary-btn" id="btnCalculateTargets">Calculate My Targets</button>
+      </div>
+
+      <div class="card">
+        <div class="nutrition-head">
+          <span class="card-label" style="margin:0;">Today's totals</span>
+          <button class="btn-small" id="editTargetsBtn" style="background:#F5F0E9; color:var(--navy); border:1px solid var(--line);">Edit targets</button>
+        </div>
+        <div style="margin-bottom:10px;"><button class="link-btn" id="btnRecalcTargets">Recalculate from stats</button></div>
+        <div class="cal-row"><span>Calories</span><strong><span id="calProgress2">0</span> / <span id="calTarget2">2000</span> kcal</strong></div>
+        <div class="progress-track"><div class="progress-fill" id="calFill2" style="width:0%;"></div></div>
+        <div class="macro-grid">
+          <div class="macro-box"><div class="m-val" id="proteinVal2">0g</div><div class="m-label">Protein</div><div class="m-bar"><div class="m-bar-fill" id="proteinBar2" style="width:0%;"></div></div></div>
+          <div class="macro-box"><div class="m-val" id="carbsVal2">0g</div><div class="m-label">Carbs</div><div class="m-bar"><div class="m-bar-fill" id="carbsBar2" style="width:0%;"></div></div></div>
+          <div class="macro-box"><div class="m-val" id="fatVal2">0g</div><div class="m-label">Fat</div><div class="m-bar"><div class="m-bar-fill" id="fatBar2" style="width:0%;"></div></div></div>
+          <div class="macro-box"><div class="m-val" id="fibreVal2">0g</div><div class="m-label">Fibre</div><div class="m-bar"><div class="m-bar-fill" id="fibreBar2" style="width:0%;"></div></div></div>
+        </div>
+      </div>
+
+      <button class="log-weight-btn" id="btnLogFoodTab" style="width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:12px; font-weight:600; font-size:14px; cursor:pointer; margin-bottom:14px;">+ Log food</button>
+
+      <div class="card">
+        <span class="card-label">Today's food log</span>
+        <ul class="log-list food-list" id="foodLogList"></ul>
+        <div class="empty-note" id="foodEmptyNote" style="display:none;">Nothing logged yet today.</div>
+      </div>
+
+    </div>
+
+    <div id="nutritionLibraryView" style="display:none;">
+      <div class="card">
+        <span class="card-label">Meal Library</span>
+        <div class="source-tabs" id="sourceTabs">
+          <button class="source-tab active" data-source="Fuel Up">Fuel Up</button>
+          <button class="source-tab" data-source="Keto">Keto</button>
+        </div>
+        <div class="cat-chips" id="catChips"></div>
+        <div id="recipeGrid"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- WORKOUTS -->
+  <section class="view" id="view-workouts">
+    <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">Workouts</h2>
+
+    <div id="workoutsHome">
+
+      <div class="session-banner" id="resumeBanner" style="display:none;">
+        <span id="resumeBannerText">Workout in progress</span>
+        <button id="btnResumeSession">Resume</button>
+      </div>
+
+      <button class="primary-btn" id="btnStartFreestyle" style="margin-top:0;">+ Start Freestyle Workout</button>
+
+      <div class="card" style="margin-top:14px;">
+        <div class="nutrition-head">
+          <span class="card-label" style="margin:0;">Your Programs</span>
+          <button class="link-btn" id="btnNewProgram">+ New Program</button>
+        </div>
+        <div id="programsList"></div>
+        <div class="empty-note" id="programsEmptyNote" style="display:none;">No saved programs yet. Build one, or just start freestyle.</div>
+      </div>
+
+    </div>
+
+    <div id="workoutSession" style="display:none;">
+      <div class="card">
+        <div class="nutrition-head">
+          <span class="card-label" style="margin:0;" id="sessionTitle">Freestyle Workout</span>
+          <button class="link-btn" id="btnAddExerciseToSession">+ Add Exercise</button>
+        </div>
+      </div>
+      <div id="sessionExerciseList"></div>
+      <div class="card">
+        <div class="finish-actions">
+          <button class="discard-btn" id="btnDiscardSession">Discard</button>
+          <button class="primary-btn" id="btnFinishSession" style="margin-top:0;">Finish Workout</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- HISTORY -->
+  <section class="view" id="view-history">
+    <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">History</h2>
+
+    <div class="card">
+      <span class="card-label">Personal Records</span>
+      <div class="pr-grid" id="prGrid"></div>
+      <div class="empty-note" id="prEmptyNote" style="display:none;">No PRs yet — finish a workout to start tracking them.</div>
+    </div>
+
+    <div class="card">
+      <span class="card-label">Past Workouts</span>
+      <div id="historyList"></div>
+      <div class="empty-note" id="historyEmptyNote" style="display:none;">No workouts logged yet.</div>
+    </div>
+
+  </section>
+
+  <!-- MORE -->
+  <section class="view" id="view-more">
+
+    <div id="moreMenu">
+      <h2 style="font-size:16px; margin-bottom:10px; color:var(--navy);">More</h2>
+      <div class="card" style="padding:4px 14px;">
+        <ul class="more-menu">
+          <li><button class="menu-item" data-target="weight"><span class="menu-icon">⚖️</span><span class="menu-title">Weight Tracker</span><span class="menu-chevron">›</span></button></li>
+          <li><button class="menu-item" data-target="photos"><span class="menu-icon">📸</span><span class="menu-title">Progress Photos</span><span class="menu-chevron">›</span></button></li>
+          <li><button class="menu-item" data-target="schedule"><span class="menu-icon">📅</span><span class="menu-title">Schedule</span><span class="menu-chevron">›</span></button></li>
+          <li><button class="menu-item" data-target="progression"><span class="menu-icon">📈</span><span class="menu-title">Progression Charts</span><span class="menu-chevron">›</span></button></li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="moreWeight" style="display:none;">
+      <div class="back-row" data-back="weight">‹ Back to More</div>
+      <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">Weight Tracker</h2>
+      <div class="chart-wrap">
+        <canvas id="weightChart"></canvas>
+      </div>
+      <button class="log-weight-btn" id="btnLogWeightTab" style="width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:12px; font-weight:600; font-size:14px; cursor:pointer;">+ Log new weight</button>
+      <div class="card" style="margin-top:14px;">
+        <span class="card-label">History</span>
+        <ul class="log-list" id="weightLogList"></ul>
+        <div class="empty-note" id="weightEmptyNote" style="display:none;">No entries yet. Log your first weigh-in above.</div>
+      </div>
+    </div>
+
+    <div id="morePhotos" style="display:none;">
+      <div class="back-row" data-back="photos">‹ Back to More</div>
+      <h2 style="font-size:16px; margin-bottom:12px; color:var(--navy);">Progress Photos</h2>
+
+      <div class="card">
+        <span class="card-label">Add Photos</span>
+        <span class="field-label" style="margin-top:0;">Date</span>
+        <input type="date" class="text-input" id="photoDateInput">
+        <div class="photo-slots" id="photoSlots"></div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Compare Dates</span>
+        <div class="segmented" id="compareAngleTabs" style="margin-bottom:12px;">
+          <button type="button" class="seg-btn active" data-angle="front">Front</button>
+          <button type="button" class="seg-btn" data-angle="side">Side</button>
+          <button type="button" class="seg-btn" data-angle="back">Back</button>
+        </div>
+        <div class="compare-row">
+          <div class="compare-col">
+            <span class="field-label" style="margin-top:0;">Date A</span>
+            <select class="text-input" id="compareDateA"></select>
+            <div class="compare-photo" id="comparePhotoA"><span class="empty-note">No photo</span></div>
+          </div>
+          <div class="compare-col">
+            <span class="field-label" style="margin-top:0;">Date B</span>
+            <select class="text-input" id="compareDateB"></select>
+            <div class="compare-photo" id="comparePhotoB"><span class="empty-note">No photo</span></div>
+          </div>
+        </div>
+        <div class="empty-note" id="compareEmptyNote" style="display:none;">Add photos on at least one date to compare.</div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">All Dates</span>
+        <div id="photoDatesList"></div>
+        <div class="empty-note" id="photoDatesEmptyNote" style="display:none;">No progress photos logged yet.</div>
+      </div>
+    </div>
+
+    <div id="moreSchedule" style="display:none;">
+      <div class="back-row" data-back="schedule">‹ Back to More</div>
+      <div class="placeholder-view"><div class="icon">📅</div><h2>Schedule</h2><p>Coming in the next build pass.</p></div>
+    </div>
+
+    <div id="moreProgression" style="display:none;">
+      <div class="back-row" data-back="progression">‹ Back to More</div>
+      <div class="placeholder-view"><div class="icon">📈</div><h2>Progression Charts</h2><p>Coming in the next build pass.</p></div>
+    </div>
+
+  </section>
+
+</main>
+
+<div class="modal-backdrop" id="weightModal">
+  <div class="modal">
+    <h3>Log Weight</h3>
+    <input type="number" step="0.1" id="weightModalInput" placeholder="0.0 kg" inputmode="decimal">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="weightModalCancel">Cancel</button>
+      <button class="btn-save" id="weightModalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="foodModal">
+  <div class="modal">
+    <h3>Log Food</h3>
+    <label>Food name</label>
+    <input type="text" id="foodName" placeholder="e.g. Grilled chicken &amp; rice" style="text-align:left; font-family:'Inter',sans-serif; font-size:15px;">
+    <div class="field-grid">
+      <div><label>Calories</label><input type="number" id="foodCal" placeholder="0"></div>
+      <div><label>Protein (g)</label><input type="number" id="foodProtein" placeholder="0"></div>
+      <div><label>Carbs (g)</label><input type="number" id="foodCarbs" placeholder="0"></div>
+      <div><label>Fat (g)</label><input type="number" id="foodFat" placeholder="0"></div>
+    </div>
+    <label>Fibre (g)</label>
+    <input type="number" id="foodFibre" placeholder="0">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="foodModalCancel">Cancel</button>
+      <button class="btn-save" id="foodModalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="targetsModal">
+  <div class="modal">
+    <h3>Edit Nutrition Targets — <span id="targetsModeLabel">Standard</span></h3>
+    <div class="field-grid">
+      <div><label>Calories</label><input type="number" id="targetCal"></div>
+      <div><label>Protein (g)</label><input type="number" id="targetProtein"></div>
+      <div><label>Carbs (g)</label><input type="number" id="targetCarbs"></div>
+      <div><label>Fat (g)</label><input type="number" id="targetFat"></div>
+    </div>
+    <label>Fibre (g)</label>
+    <input type="number" id="targetFibre">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="targetsModalCancel">Cancel</button>
+      <button class="btn-save" id="targetsModalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="programModal">
+  <div class="modal">
+    <h3>New Program</h3>
+    <label>Program name</label>
+    <input type="text" id="programNameInput" placeholder="e.g. Push Day" style="text-align:left; font-family:'Inter',sans-serif; font-size:15px;">
+    <div id="programExerciseList" style="margin:10px 0;"></div>
+    <button class="secondary-btn" id="btnAddExerciseToProgram" style="margin-top:0;">+ Add Exercise</button>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="programModalCancel">Cancel</button>
+      <button class="btn-save" id="programModalSave">Save Program</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="exercisePickerModal">
+  <div class="modal">
+    <h3>Add Exercise</h3>
+    <label>Exercise name</label>
+    <input type="text" id="exercisePickerName" placeholder="e.g. Bench Press" style="text-align:left; font-family:'Inter',sans-serif; font-size:15px;">
+    <label>Type</label>
+    <div class="segmented" id="exercisePickerType" style="margin-bottom:14px;">
+      <button type="button" class="seg-btn active" data-type="strength">Strength</button>
+      <button type="button" class="seg-btn" data-type="cardio">Cardio</button>
+      <button type="button" class="seg-btn" data-type="core">Core</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="exercisePickerCancel">Cancel</button>
+      <button class="btn-save" id="exercisePickerAdd">Add</button>
+    </div>
+  </div>
+</div>
+
+<nav class="tabbar">
+  <button class="active" data-view="dashboard"><span class="tab-icon">⌂</span>Dashboard</button>
+  <button data-view="nutrition"><span class="tab-icon">🥗</span>Nutrition</button>
+  <button data-view="workouts"><span class="tab-icon">🏋</span>Workouts</button>
+  <button data-view="history"><span class="tab-icon">📜</span>History</button>
+  <button data-view="more"><span class="tab-icon">▤</span>More</button>
+</nav>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'forge_data_v1';
+  const WATER_SEGMENTS = 12;
+  const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MEAL_LIBRARY = [{"id": "m1", "name": "Tuna + Lemon Tahini", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 320, "protein": 38, "carbs": 14, "fat": 10, "fibre": 6, "ingredients": ["2 x 95g cans tuna in springwater (drained)", "1 portion tradie salad base", "1 tbsp tahini", "Juice of \u00bd lemon (or 1 tbsp bottled lemon juice)", "1 tbsp water (to thin the dressing)", "Salt and pepper", "Lemon tahini \u2014 mix 1 tbsp tahini + 1 tbsp lemon juice + 1 tbsp water. Shake in a small jar.", "Or swap: light balsamic dressing, or squeeze of sweet chilli sauce"], "method": ["Open and drain tuna.", "Make dressing: combine tahini, lemon juice and water in a small container. Shake or stir until smooth.", "Put your salad base portion in a container.", "Top with tuna.", "Drizzle dressing over \u2014 pack separately if prepping ahead."], "note": "Tuna is the fastest high-protein lunch on this list. Two cans = 40g protein with almost no effort.", "tags": []}, {"id": "m2", "name": "Chicken + Honey Mustard", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 380, "protein": 46, "carbs": 14, "fat": 9, "fibre": 6, "ingredients": ["150g cooked chicken breast, sliced (from Sunday batch cook)", "1 portion tradie salad base", "1 tbsp light honey mustard dressing", "1 tbsp plain Greek yoghurt (makes it creamy)", "Honey mustard: mix 1 tbsp honey mustard + 1 tbsp Greek yoghurt. Creamy and tasty.", "Or swap: sweet chilli sauce, light Caesar, or soy + sesame dressing"], "method": ["Slice your batch-cooked chicken.", "Mix honey mustard and Greek yoghurt in a small container.", "Add salad base to your container, top with chicken.", "Drizzle dressing over \u2014 or pack it separately."], "note": "Batch cook 1kg of chicken Sunday. This meal takes 3 minutes to assemble all week.", "tags": []}, {"id": "m3", "name": "Boiled Eggs + Light Caesar", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 295, "protein": 20, "carbs": 12, "fat": 14, "fibre": 6, "ingredients": ["3 hard boiled eggs (batch cooked Sunday)", "1 portion tradie salad base", "1.5 tbsp light Caesar dressing (Paul Newman's Light)", "10g shaved parmesan (optional \u2014 counts towards fat)", "Light Caesar: Paul Newman's Light Caesar is the best option \u2014 about 45 kcal per tbsp.", "Or swap: lemon tahini, or just olive oil + lemon + salt"], "method": ["Peel your pre-boiled eggs and halve them.", "Put salad base in your container.", "Arrange egg halves on top.", "Drizzle Caesar dressing over and add parmesan if using."], "note": "Boiled eggs are already done if you prepped Sunday. This is a zero-cooking lunch.", "tags": []}, {"id": "m4", "name": "Beef Strips + Soy Ginger", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 390, "protein": 40, "carbs": 14, "fat": 14, "fibre": 6, "ingredients": ["150g lean beef strips (pan-fried Sunday or the night before)", "1 portion tradie salad base", "1 tbsp reduced-salt soy sauce", "1 tsp sesame oil", "\u00bd tsp fresh ginger (or ground ginger)", "1 tsp honey", "Soy ginger: mix soy sauce + sesame oil + ginger + honey. Shake in a small jar.", "Or swap: hoisin sauce thinned with a splash of water, or sweet chilli"], "method": ["Cook beef strips: heat pan on high, spray oil, cook 3\u20134 mins. Season with soy sauce.", "Make dressing: combine soy, sesame oil, ginger and honey.", "Cool beef before adding to salad \u2014 or reheat separately and eat warm.", "Put salad base in container, top with beef, drizzle dressing."], "note": "Cook the beef the night before or on Sunday. Tastes great cold with the soy ginger dressing.", "tags": []}, {"id": "m5", "name": "Salmon + Dill Yoghurt", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 420, "protein": 38, "carbs": 12, "fat": 18, "fibre": 6, "ingredients": ["150g cooked salmon fillet (bake or pan-fry Sunday)", "1 portion tradie salad base", "2 tbsp plain Greek yoghurt", "\u00bd tsp dried dill (or fresh if you have it)", "1 tsp lemon juice", "Salt and pepper", "Dill yoghurt: mix Greek yoghurt + dill + lemon juice + salt. Takes 30 seconds.", "Or swap: lemon tahini, or just a squeeze of lemon and olive oil"], "method": ["Cook salmon: spray pan, cook skin-side down 4 mins, flip, 3 more mins. Or bake 180\u00b0C 15 mins.", "Make dressing: mix yoghurt, dill, lemon juice, salt.", "Flake salmon into chunks.", "Put salad base in container, top with salmon, dollop dressing."], "note": "Salmon has healthy fats that help you feel full and support weight loss. Don't fear the fat \u2014 it's the good kind.", "tags": []}, {"id": "m6", "name": "Turkey + Balsamic", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 300, "protein": 36, "carbs": 14, "fat": 7, "fibre": 6, "ingredients": ["120g deli turkey breast slices", "1 portion tradie salad base", "1 tbsp light balsamic dressing", "30g lite feta cheese (optional \u2014 adds 40 kcal)", "Light balsamic: Ken's or Paul Newman's Light. About 30\u201340 kcal per tbsp.", "Or swap: honey mustard, sweet chilli, or lemon tahini"], "method": ["Open the deli turkey \u2014 it's already cooked.", "Put salad base in your container.", "Lay turkey slices on top, crumble feta if using.", "Drizzle balsamic over."], "note": "This is the easiest possible lunch \u2014 zero cooking if you have turkey from the deli counter.", "tags": []}, {"id": "m7", "name": "Chickpeas + Sweet Chilli", "category": "Salad Proteins", "source": "Fuel Up", "kcal": 355, "protein": 18, "carbs": 46, "fat": 7, "fibre": 14, "ingredients": ["1 x 400g can chickpeas, drained and rinsed", "1 portion tradie salad base", "1 tbsp sweet chilli sauce", "1 tbsp lemon juice", "30g lite feta (optional)", "1 tbsp sunflower seeds", "Sweet chilli + lemon: simple and tasty. Squeeze lemon first, then drizzle sweet chilli.", "Or swap: Greek dressing (olive oil + lemon + oregano), or lemon tahini"], "method": ["Open and rinse chickpeas.", "Put salad base in your container.", "Pour chickpeas on top.", "Crumble feta if using, sprinkle sunflower seeds.", "Drizzle sweet chilli and lemon juice over."], "note": "Chickpeas have 14g fibre per serve \u2014 that's enormous. You will NOT be hungry after this salad.", "tags": []}, {"id": "m8", "name": "Chicken Rice Bowl", "category": "Lunches", "source": "Fuel Up", "kcal": 480, "protein": 45, "carbs": 45, "fat": 8, "fibre": 4, "ingredients": ["150g cooked chicken breast (sliced)", "1 microwave brown rice cup", "Large handful baby spinach", "\u00bd cucumber, sliced", "2 tbsp low-sodium soy sauce", "1 tsp sesame oil (optional)"], "method": ["Microwave the rice cup for 90 seconds.", "Slice your cooked chicken \u2014 if reheating, microwave 1\u20132 minutes until hot.", "Put rice in container, top with spinach and cucumber.", "Pour over soy sauce and sesame oil.", "Eat cold or reheat the whole thing at work."], "note": "Batch cook 1kg of chicken on Sunday and this takes 3 minutes to assemble all week.", "tags": []}, {"id": "m9", "name": "High-Protein Chicken Wrap", "category": "Lunches", "source": "Fuel Up", "kcal": 420, "protein": 40, "carbs": 35, "fat": 9, "fibre": 5, "ingredients": ["1 large wholegrain wrap", "130g cooked chicken breast", "2 tbsp hummus", "Large handful mixed lettuce", "\u00bd capsicum, sliced", "1 tsp sweet chilli sauce"], "method": ["Lay the wrap flat on a surface.", "Spread hummus across the whole wrap.", "Add lettuce, capsicum, then chicken.", "Drizzle sweet chilli sauce over the top.", "Fold in the sides, then roll up tightly. Wrap in foil."], "note": "Make 2 at once and put the second in the fridge. Tomorrow's lunch is already done.", "tags": []}, {"id": "m10", "name": "Beef & Rice Container", "category": "Lunches", "source": "Fuel Up", "kcal": 490, "protein": 40, "carbs": 48, "fat": 11, "fibre": 5, "ingredients": ["150g extra-lean beef mince (cooked)", "1 microwave brown rice cup", "1 cup frozen stir-fry veg (microwaved)", "2 tbsp reduced-salt soy sauce", "1 tsp garlic powder", "1 tsp ginger (optional)"], "method": ["Brown the mince in a non-stick pan, break it up as it cooks.", "Add garlic powder, soy sauce, ginger. Stir through.", "Microwave rice cup and veg separately, combine everything in a container.", "Refrigerate \u2014 reheat at work for 2\u20133 minutes."], "note": "Cook a double batch of mince on Sunday. Freeze the extra in zip-lock bags.", "tags": []}, {"id": "m11", "name": "Egg & Veg Frittata Slice", "category": "Lunches", "source": "Fuel Up", "kcal": 310, "protein": 26, "carbs": 8, "fat": 18, "fibre": 2, "ingredients": ["6 eggs (for the whole batch)", "1 cup frozen mixed veg (defrosted)", "\u00bd cup lite grated cheese", "1 small zucchini, grated", "Salt, pepper, mixed herbs", "Olive oil spray"], "method": ["Preheat oven to 180\u00b0C. Spray a baking dish or muffin tin with olive oil.", "Beat the 6 eggs in a bowl.", "Mix in the veg, cheese, zucchini, herbs, salt and pepper.", "Pour into the dish or tin \u2014 fill muffin holes \u00be full.", "Bake 20\u201325 minutes until set and golden. Makes 4 servings."], "note": "These keep 4 days in the fridge and are great eaten cold \u2014 no microwave needed on site.", "tags": []}, {"id": "m12", "name": "Roast Beef & Salad Roll", "category": "Lunches", "source": "Fuel Up", "kcal": 390, "protein": 35, "carbs": 38, "fat": 7, "fibre": 4, "ingredients": ["1 wholegrain roll", "120g lean deli roast beef slices", "1 tbsp wholegrain mustard", "Handful rocket or spinach", "4 slices cucumber", "2 slices lite cheese"], "method": ["Slice your roll in half.", "Spread mustard on one side.", "Layer cheese, then beef, then salad.", "Close it up. Wrap in foil if eating later."], "note": "Deli roast beef is very lean. Avoid processed meats like ham more than once or twice a week \u2014 too much sodium.", "tags": []}, {"id": "m13", "name": "Turkey & Avocado Sandwich", "category": "Lunches", "source": "Fuel Up", "kcal": 410, "protein": 34, "carbs": 36, "fat": 12, "fibre": 6, "ingredients": ["2 slices wholegrain bread", "120g deli turkey breast slices", "\u00bc avocado (about 50g)", "1 tsp Dijon mustard", "Large handful spinach", "4 slices tomato"], "method": ["Spread avocado on one slice and mash it slightly.", "Spread mustard on the other slice.", "Layer turkey, spinach and tomato.", "Press together and wrap in baking paper."], "note": "Squeeze a little lemon on the avocado to stop it browning if making ahead.", "tags": []}, {"id": "m14", "name": "Boiled Eggs", "category": "Snacks", "source": "Fuel Up", "kcal": 140, "protein": 12, "carbs": 1, "fat": 10, "fibre": 0, "ingredients": ["2 large eggs", "Pinch of salt and pepper", "Optional: small sachet of hot sauce"], "method": ["Put eggs in a pot, cover with cold water.", "Bring to boil over high heat.", "Once boiling, reduce to medium and cook 9 minutes for hard boiled.", "Run under cold water to stop cooking. Peel and eat, or store in fridge up to 5 days."], "note": "Batch boil 6\u20138 on Sunday. Zero effort for the rest of the week.", "tags": []}, {"id": "m15", "name": "Greek Yoghurt & Berries", "category": "Snacks", "source": "Fuel Up", "kcal": 175, "protein": 18, "carbs": 16, "fat": 3, "fibre": 2, "ingredients": ["200g plain Greek yoghurt (low-fat)", "\u00bd cup frozen berries (defrosted or still frozen)", "1 tsp honey (optional)"], "method": ["Scoop yoghurt into a container.", "Top with berries \u2014 frozen is fine if packing for later.", "Add honey if you want it sweeter."], "note": "Buy big tubs of plain Greek yoghurt \u2014 much cheaper than individual cups. Chobani or Jalna are great.", "tags": []}, {"id": "m16", "name": "Cottage Cheese & Crackers", "category": "Snacks", "source": "Fuel Up", "kcal": 200, "protein": 19, "carbs": 18, "fat": 4, "fibre": 3, "ingredients": ["150g low-fat cottage cheese", "5\u20136 Ryvita crackers", "Pinch of black pepper or paprika"], "method": ["Scoop cottage cheese into a small container.", "Pack crackers separately so they stay crunchy.", "Dip and eat. Add pepper or paprika for flavour."], "note": "Cottage cheese has more protein per calorie than almost any other food. Try it cold with a little salt and crunch.", "tags": []}, {"id": "m17", "name": "Tuna Snack Pack & Crackers", "category": "Snacks", "source": "Fuel Up", "kcal": 185, "protein": 22, "carbs": 12, "fat": 4, "fibre": 1, "ingredients": ["1 x Sirena flavoured tuna snack pack (no can opener needed)", "5 Ryvita crackers"], "method": ["Open the snack pack.", "Eat with crackers."], "note": "Sirena make flavoured tuna packs \u2014 lemon & herb, chilli, etc. Great for a toolbox or ute.", "tags": []}, {"id": "m18", "name": "Pre-Portioned Almonds", "category": "Snacks", "source": "Fuel Up", "kcal": 120, "protein": 4, "carbs": 4, "fat": 10, "fibre": 2, "ingredients": ["20g raw almonds (roughly 18\u201320 nuts)"], "method": ["Weigh out 20g on your kitchen scale once.", "Note what that looks like \u2014 about a small handful.", "Pre-bag into zip-lock bags on Sunday.", "Grab one bag when you need a snack."], "note": "Almonds are healthy but easy to overeat. A 20g portion is the rule \u2014 not \"a handful\" because your handful is probably 40\u201350g.", "tags": []}, {"id": "m19", "name": "Babybel + Apple", "category": "Snacks", "source": "Fuel Up", "kcal": 155, "protein": 7, "carbs": 20, "fat": 6, "fibre": 3, "ingredients": ["2 x Babybel Light", "1 medium apple"], "method": ["Grab both and put them in your lunch bag.", "Eat the apple first (fibre fills you up), then the cheese."], "note": "Babybel Light is only 45 kcal each and 5g protein. The red wax keeps it shelf stable all day \u2014 no refrigeration needed.", "tags": []}, {"id": "m20", "name": "Protein Shake", "category": "Snacks", "source": "Fuel Up", "kcal": 160, "protein": 25, "carbs": 8, "fat": 3, "fibre": 1, "ingredients": ["1 scoop vanilla or choc whey protein powder (~30g)", "300ml cold water or low-fat milk", "Optional: \u00bd banana"], "method": ["Add water or milk to a shaker bottle.", "Add protein powder.", "Screw lid on, shake 10\u201315 seconds.", "Drink immediately or within an hour."], "note": "Not a meal replacement \u2014 use as a snack or when you've missed a meal. Muscle Nation, Optimum Nutrition, and BSc are solid budget options.", "tags": []}, {"id": "m21", "name": "Banana & Peanut Butter", "category": "Snacks", "source": "Fuel Up", "kcal": 210, "protein": 7, "carbs": 32, "fat": 7, "fibre": 3, "ingredients": ["1 medium banana", "1 tbsp natural peanut butter (15g)"], "method": ["Peel banana.", "Dip in peanut butter or spread it on."], "note": "Buy natural peanut butter (just peanuts, no added sugar). The oil separates \u2014 just stir it back in.", "tags": []}, {"id": "m22", "name": "Edamame (Salted)", "category": "Snacks", "source": "Fuel Up", "kcal": 125, "protein": 11, "carbs": 9, "fat": 5, "fibre": 5, "ingredients": ["150g frozen edamame in pods", "Pinch of sea salt"], "method": ["Put edamame in a microwave-safe bowl.", "Microwave for 3 minutes.", "Sprinkle with salt and eat by squeezing beans out of the pods."], "note": "Frozen edamame at Woolies or Coles in the frozen veg aisle. Great cold too \u2014 put them in your bag frozen and they'll be ready by smoko.", "tags": []}, {"id": "m23", "name": "Vegemite & Cottage Cheese Rice Cakes", "category": "Snacks", "source": "Fuel Up", "kcal": 165, "protein": 14, "carbs": 20, "fat": 2, "fibre": 2, "ingredients": ["3 plain rice cakes", "3 tbsp cottage cheese", "Vegemite (thin scrape on each)", "Optional toppings: sliced cucumber, tomato, shallots, or a sprinkle of sesame seeds"], "method": ["Lay out 3 rice cakes.", "Spread a thin scrape of Vegemite on each (it's salty, a little goes a long way).", "Spoon cottage cheese on top.", "Add any optional toppings you like."], "note": "Topping options: cucumber slices, cherry tomato halves, sliced shallot, cracked pepper, sesame seeds, or a thin slice of deli turkey on top.", "tags": []}, {"id": "m24", "name": "Celery & Peanut Butter", "category": "Snacks", "source": "Fuel Up", "kcal": 145, "protein": 5, "carbs": 8, "fat": 10, "fibre": 3, "ingredients": ["4 celery stalks, cut into sticks", "1.5 tbsp natural peanut butter (22g)", "Optional: raisins pressed into the peanut butter (classic \"ants on a log\")"], "method": ["Cut celery into sticks \u2014 do this on Sunday for the week.", "Pack peanut butter in a small container.", "Dip and eat."], "note": "Celery is almost zero calories. The peanut butter is where the energy comes from \u2014 stick to 1.5 tbsp max.", "tags": []}, {"id": "m25", "name": "Microwave Scrambled Eggs", "category": "Snacks", "source": "Fuel Up", "kcal": 175, "protein": 18, "carbs": 2, "fat": 10, "fibre": 0, "ingredients": ["3 large eggs", "2 tbsp low-fat milk", "Salt and pepper", "Optional: splash of hot sauce or a sprinkle of cheese"], "method": ["Crack 3 eggs into a microwave-safe mug or bowl.", "Add milk, salt and pepper. Beat with a fork.", "Microwave for 60 seconds. Stir.", "Microwave another 30\u201360 seconds until just set \u2014 don't overcook or they go rubbery.", "Eat straight from the mug."], "note": "This works in a kettle room at any job site. One mug, one fork, done in 2 minutes. Add hot sauce if you have it.", "tags": []}, {"id": "m26", "name": "Frozen Grapes", "category": "Snacks", "source": "Fuel Up", "kcal": 90, "protein": 1, "carbs": 22, "fat": 0, "fibre": 1, "ingredients": ["1 cup seedless grapes (about 150g)"], "method": ["Wash grapes and pat dry.", "Pull them off the stems.", "Put in a zip-lock bag or container.", "Freeze for at least 4 hours \u2014 overnight is best.", "Eat them frozen like little flavour bombs."], "note": "When you're craving something sweet, frozen grapes are the best swap. They taste like sorbet and take ages to eat. Prep on Sunday \u2014 always have a bag in the freezer.", "tags": []}, {"id": "m27", "name": "Overnight Oats", "category": "Snacks", "source": "Fuel Up", "kcal": 380, "protein": 28, "carbs": 45, "fat": 7, "fibre": 5, "ingredients": ["60g rolled oats", "200ml low-fat milk", "1 scoop vanilla protein powder (~30g)", "1 tsp honey", "Optional: \u00bd banana or handful of berries (add in the morning)"], "method": ["Put oats, milk, protein powder and honey in a jar or container with a lid.", "Stir everything together.", "Put the lid on and put in the fridge.", "In the morning \u2014 grab the jar and go. No heating needed.", "Add banana or berries just before eating if you want."], "note": "Make 5 jars on Sunday night. This is your 5:30am breakfast sorted for the whole week \u2014 zero morning effort. Also works as a snack if you're only having half a portion (halve all quantities = ~190 kcal).", "tags": []}, {"id": "m28", "name": "Bliss Balls", "category": "Snacks", "source": "Fuel Up", "kcal": 185, "protein": 6, "carbs": 20, "fat": 9, "fibre": 3, "ingredients": ["1 cup rolled oats (90g)", "\u00bd cup natural peanut butter (130g)", "3 tbsp honey", "\u00bd scoop protein powder (optional but recommended)", "2 tbsp desiccated coconut", "2 tbsp dark choc chips (optional)"], "method": ["Mix all ingredients together in a bowl until combined. If it's too dry, add 1 tsp of water.", "Roll into balls about the size of a 50c coin \u2014 you should get 12\u201314 balls.", "Roll in extra coconut if you like.", "Put on a plate or tray, refrigerate for 30 minutes to firm up.", "Store in an airtight container in the fridge. Lasts 1 week."], "note": "Base recipe variations: add cinnamon for warmth; swap peanut butter for almond butter; add dried cranberries instead of choc chips; add a tbsp of cocoa powder for a chocolate version. One ball = ~185 kcal so stick to 1\u20132 as a snack.", "tags": []}, {"id": "m29", "name": "Deli Meats & Cheese Roll-Ups", "category": "Snacks", "source": "Fuel Up", "kcal": 180, "protein": 20, "carbs": 2, "fat": 10, "fibre": 0, "ingredients": ["4 slices deli turkey or chicken breast", "2 lite cheese slices", "Optional: thin spread of mustard, or a sliver of cucumber inside each roll"], "method": ["Lay a slice of deli meat flat.", "Place a half-slice of cheese on top.", "Add mustard or cucumber if using.", "Roll up tightly.", "Repeat. Eat as is or pack in a container."], "note": "Buy from the deli counter at Woolies \u2014 ask for it sliced thin. Cheaper than pre-packaged and better quality. Make 6\u20138 at once and keep in the fridge.", "tags": []}, {"id": "m30", "name": "Greek Yoghurt (Tub or Pouch)", "category": "Grab & Go", "source": "Fuel Up", "kcal": 110, "protein": 15, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Best options: Chobani 170g tub (~15g protein, 95 kcal), Farmers Union Protein Pouch (~20g protein)", "Chobani Flip has a small topping to mix in \u2014 fun and still a good choice", "Choose plain or low-sugar flavours \u2014 avoid ones with 20g+ sugar", "Available: Woolies, Coles, most service stations"], "note": "One of the best grab-and-go snacks available. High protein, low fat, and keeps you full.", "tags": []}, {"id": "m31", "name": "Protein Bars", "category": "Grab & Go", "source": "Fuel Up", "kcal": 190, "protein": 20, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Good options: Quest Bar, Musashi P30, Macro Mike, Vow Nutrition", "What to look for on the label: 15g+ protein, under 200 kcal, under 10g sugar", "Avoid: bars with 30g+ sugar or more fat than protein", "Available: Woolies, Coles, Chemist Warehouse, servos, gym vending machines"], "note": "Not all protein bars are equal. Some are basically chocolate bars in disguise. Here's what to look for.", "tags": []}, {"id": "m32", "name": "Beef Jerky", "category": "Grab & Go", "source": "Fuel Up", "kcal": 100, "protein": 14, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Best options: Jack Link's Original, Primo Beef Jerky, or bulk packs from Costco", "Serving size is usually 25\u201330g \u2014 stick to one serve", "Avoid: teriyaki or honey-flavoured versions (more sugar)", "Available: service stations, Woolies, Coles, petrol stations, Costco"], "note": "Great protein hit, shelf stable, and satisfying to chew. Watch the sodium \u2014 it's high, so don't eat it every day.", "tags": []}, {"id": "m33", "name": "Roasted Chickpeas", "category": "Grab & Go", "source": "Fuel Up", "kcal": 130, "protein": 6, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Look for: Cobs Roasted Chickpeas or Munch Crunch in the health snack aisle", "Flavours: sea salt, chilli lime, BBQ \u2014 all good", "Serving: stick to 30\u201340g (the small individual snack bags are perfect)", "Available: Woolies, Coles (health snack aisle), some servos"], "note": "Crunchy, satisfying, and way better than chips. High fibre keeps you full.", "tags": []}, {"id": "m34", "name": "Cheese & Crackers Packs", "category": "Grab & Go", "source": "Fuel Up", "kcal": 170, "protein": 8, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Best options: Cracker Barrel Snack Packs, Bega Cheese & Crackers", "Look for ones with wholegrain crackers \u2014 more fibre", "Avoid: ones that come with a high-sugar jam \u2014 skip it or use very little", "Available: Woolies, Coles (fridge/deli section), some petrol stations"], "note": "Ready-made portion-controlled packs. Convenient and satisfying.", "tags": []}, {"id": "m35", "name": "Babybel Cheese", "category": "Grab & Go", "source": "Fuel Up", "kcal": 70, "protein": 5, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Babybel Light = 45 kcal, 5g protein each \u2014 better option", "Babybel Original = 70 kcal, 4g protein each", "Pair with an apple or almonds for a more complete snack", "Available: Woolies, Coles (fridge section), most service stations"], "note": "Small, individually wrapped wax cheese rounds. Sit in your bag all day without needing refrigeration.", "tags": []}, {"id": "m36", "name": "Protein Milk (Ready-to-Drink)", "category": "Grab & Go", "source": "Fuel Up", "kcal": 160, "protein": 25, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Best options: Masters High Protein Milk, Nippy's Protein Shake, a2 Protein Milk", "Chocolate flavour tastes like a treat and still has 20\u201325g protein", "Check the label \u2014 some \"protein\" milks are actually just flavoured milk (under 10g protein)", "Available: service stations, Woolies, Coles, gyms"], "note": "Cold flavoured milk with added protein. Easy to grab from a servo fridge.", "tags": []}, {"id": "m37", "name": "Sushi Train Rice Paper Rolls", "category": "Grab & Go", "source": "Fuel Up", "kcal": 180, "protein": 12, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Order: 2 prawn rice paper rolls or 2 chicken rice paper rolls", "Avoid: fried options (spring rolls, tempura) \u2014 much higher calorie", "Dipping sauce: ask for a small one \u2014 soy or sweet chilli, not peanut sauce (high cal)", "Available: sushi trains, food courts, some Woolies delis"], "note": "Fresh, light, and surprisingly filling. Good option if you're near a food court or sushi train.", "tags": []}, {"id": "m38", "name": "Pre-Packed Boiled Eggs", "category": "Grab & Go", "source": "Fuel Up", "kcal": 140, "protein": 12, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Woolies sells 2-pack boiled eggs in the deli / prepared foods section in some stores", "Or: boil 6\u20138 on Sunday and keep in the fridge all week \u2014 5 days easy", "Season with salt, pepper, or a dash of hot sauce", "Pair with fruit for a complete snack hit"], "note": "Some supermarkets and delis sell pre-cooked peeled eggs. Or batch cook your own on Sunday \u2014 same thing.", "tags": []}, {"id": "m39", "name": "Up&Go Protein or Sustagen", "category": "Grab & Go", "source": "Fuel Up", "kcal": 200, "protein": 15, "carbs": null, "fat": null, "fibre": null, "ingredients": [], "method": ["Up&Go Protein (Blue): 200 kcal, 15g protein \u2014 better than the standard version", "Sustagen Sport: 220 kcal, 14g protein \u2014 similar idea", "Use as a backup only \u2014 real food is always better", "Available: Woolies, Coles, most service stations and convenience stores"], "note": "A drinkable breakfast or snack. Not ideal every day but useful when you're truly rushed at 5:30am.", "tags": []}, {"id": "m40", "name": "Lemon Herb Chicken Risotto", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 480, "protein": 42, "carbs": 52, "fat": 9, "fibre": 4, "ingredients": ["300g chicken breast, diced into 2cm pieces", "1 brown onion, quartered", "1 leek, white part only, sliced", "2 garlic cloves", "300g arborio rice (must be arborio \u2014 not regular rice)", "800ml chicken stock (2 stock cubes + 800g water)", "150ml dry white wine OR extra 150ml stock", "Juice and zest of 1 lemon", "1 cup frozen peas", "1 zucchini, diced", "20g parmesan, grated (optional)", "Salt, pepper, fresh or dried parsley"], "method": ["Add onion, leek and garlic to the TM31 bowl. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 15g olive oil. Cook: 3 minutes, 100\u00b0C, Speed 1.", "Add chicken. Cook: 5 minutes, 100\u00b0C, Speed 1, Reverse.", "Add arborio rice. Cook: 2 minutes, 100\u00b0C, Speed 1, Reverse (this toasts the rice).", "Add stock, wine (if using), lemon juice and zest, zucchini.", "Cook: 18 minutes, 100\u00b0C, Speed 1, Reverse. Set the timer.", "Add frozen peas in the last 3 minutes.", "Taste \u2014 add salt and pepper. Stir in parmesan if using. Serve immediately (risotto thickens as it sits)."], "note": "Risotto needs to be eaten fresh \u2014 it doesn't reheat as well as other meals. Make it for dinner and eat it that night. Leftovers can be made into fried risotto cakes the next day.", "tags": []}, {"id": "m41", "name": "Mexican Pulled Chicken", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 450, "protein": 48, "carbs": 38, "fat": 8, "fibre": 9, "ingredients": ["2 large chicken breasts (about 400g)", "1 brown onion, quartered", "3 garlic cloves", "1 tsp cumin", "1 tsp smoked paprika", "\u00bd tsp chilli powder (or to taste)", "400g can diced tomatoes", "400g can black beans, drained", "\u00bd cup frozen corn", "1 chicken stock cube + 100ml water", "Juice of 1 lime (or 1 tbsp bottled lime juice)", "1 microwave brown rice cup per serve"], "method": ["Add onion and garlic to the bowl. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 10g oil. Cook: 3 minutes, 100\u00b0C, Speed 1.", "Add cumin, smoked paprika, chilli. Cook: 1 minute, 100\u00b0C, Speed 1 (toasts the spices).", "Add diced tomatoes, black beans, corn, stock cube and water. Stir.", "Place whole chicken breasts into the bowl \u2014 push them down into the sauce.", "Cook: 30 minutes, 100\u00b0C, Speed 1, Reverse.", "Remove chicken breasts with tongs (they'll be very soft). Place in a bowl and shred with two forks \u2014 it pulls apart easily.", "Return shredded chicken to the bowl. Add lime juice. Stir through.", "Serve over microwaved rice."], "note": "This makes enough for 3 serves \u2014 great for batch cooking. The pulled chicken also works in wraps or on the tradie salad base instead of rice.", "tags": []}, {"id": "m42", "name": "Bolognese Sauce (TM31)", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 490, "protein": 42, "carbs": 50, "fat": 12, "fibre": 7, "ingredients": ["1 brown onion, quartered", "2 carrots, roughly chopped", "2 celery stalks, roughly chopped", "3 garlic cloves", "400g extra-lean beef mince", "400g can diced tomatoes", "1 beef stock cube + 150ml water", "1 tbsp tomato paste", "1 tsp dried mixed herbs", "1 tsp smoked paprika", "Salt and pepper", "80g dried penne or spaghetti per serve (cooked separately)"], "method": ["Add onion, carrot, celery and garlic to bowl. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 10g oil. Cook: 5 minutes, 100\u00b0C, Speed 1.", "Add beef mince. Cook: 8 minutes, 100\u00b0C, Speed 1, Reverse \u2014 breaking up the mince.", "Add diced tomatoes, stock cube, water, tomato paste, herbs and paprika.", "Cook: 25 minutes, 100\u00b0C, Speed 1, Reverse.", "Meanwhile, boil pasta in a separate pot as per packet.", "Season with salt and pepper. Serve sauce over drained pasta."], "note": "This makes 4 serves of sauce \u2014 freeze half in zip-lock bags. The TM31 chops the veg for you so there's almost no prep. Weigh your pasta dry: 80g per serve.", "tags": []}, {"id": "m43", "name": "Thai Green Curry (TM31)", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 460, "protein": 40, "carbs": 38, "fat": 14, "fibre": 6, "ingredients": ["350g chicken breast, diced", "1 brown onion, quartered", "2 garlic cloves", "1 tbsp green curry paste (Maesri or Valcom \u2014 use 1 tbsp for mild, 2 for hot)", "200ml light coconut milk", "200ml chicken stock (1 stock cube + 200g water)", "1 zucchini, sliced into rounds", "1 cup broccoli florets", "1 cup baby spinach", "Fish sauce: 1 tbsp (from Asian section at Woolies)", "Juice of \u00bd lime", "1 microwave brown rice cup per serve"], "method": ["Add onion and garlic to bowl. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 10g oil and green curry paste. Cook: 3 minutes, 100\u00b0C, Speed 1. The kitchen will smell amazing.", "Add chicken. Cook: 5 minutes, 100\u00b0C, Speed 1, Reverse.", "Add coconut milk, chicken stock, zucchini and broccoli.", "Cook: 15 minutes, 100\u00b0C, Speed 1, Reverse.", "Add spinach in the last 2 minutes \u2014 it wilts quickly.", "Add fish sauce and lime juice. Taste \u2014 adjust heat by adding more curry paste if you want.", "Serve over microwaved rice."], "note": "Green curry paste keeps in the fridge for months after opening. Start with 1 tbsp if you don't know your heat tolerance \u2014 you can always add more. Fish sauce smells strong but adds incredible depth to the flavour.", "tags": []}, {"id": "m44", "name": "Chicken & Mushroom Stroganoff (TM31)", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 430, "protein": 44, "carbs": 30, "fat": 12, "fibre": 4, "ingredients": ["350g chicken breast, diced", "1 brown onion, quartered", "2 garlic cloves", "300g button mushrooms, halved", "200ml chicken stock (1 stock cube + 200g water)", "150ml light sour cream (or plain Greek yoghurt \u2014 less fat)", "1 tbsp Dijon mustard", "1 tbsp Worcestershire sauce", "Salt and pepper", "1 serve egg noodles or microwave rice"], "method": ["Add onion and garlic to bowl. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 10g oil. Cook: 3 minutes, 100\u00b0C, Speed 1.", "Add chicken. Cook: 5 minutes, 100\u00b0C, Speed 1, Reverse.", "Add mushrooms, stock, Dijon mustard and Worcestershire sauce.", "Cook: 15 minutes, 100\u00b0C, Speed 1, Reverse.", "Add light sour cream (or Greek yoghurt). Stir through with the spatula \u2014 do NOT cook again after this or the cream will split.", "Season with salt and pepper. Serve over noodles or rice."], "note": "Greek yoghurt is the lower-fat swap for sour cream \u2014 stir it in off the heat and the sauce stays creamy. Worcestershire sauce is in the condiments aisle at any supermarket.", "tags": []}, {"id": "m45", "name": "Steamed Fish with Ginger & Soy (TM31 Varoma)", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 370, "protein": 44, "carbs": 28, "fat": 7, "fibre": 5, "ingredients": ["2 white fish fillets (basa or barramundi, about 300g)", "2 cups bok choy or broccoli", "700ml water in the bowl", "1 chicken or fish stock cube", "3 slices fresh ginger", "2 tbsp reduced-salt soy sauce", "1 tsp sesame oil", "2 shallots, sliced thin", "1 microwave brown rice cup per serve"], "method": ["Pour 700ml water into the TM31 bowl. Add stock cube and ginger slices.", "Place bok choy or broccoli in the Varoma tray.", "Lay fish fillets flat on top of the vegetables in the Varoma.", "Drizzle 1 tbsp soy sauce over the fish. Place Varoma lid on.", "Place Varoma on top of the TM31.", "Cook: 18\u201322 minutes, Varoma temp, Speed 2. (Basa needs 18 mins, thicker fillets 22 mins.)", "Check fish is cooked \u2014 it should flake easily with a fork.", "Microwave rice. Serve fish and veg over rice. Mix remaining soy sauce with sesame oil and drizzle over. Top with sliced shallots."], "note": "Basa fillets are cheap, mild-flavoured, and great for beginners. Find them in the frozen fish section. No bones to worry about.", "tags": []}, {"id": "m46", "name": "Beef & Bean Chilli (TM31)", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 480, "protein": 40, "carbs": 38, "fat": 12, "fibre": 11, "ingredients": ["1 brown onion, quartered", "2 garlic cloves", "400g extra-lean beef mince", "400g can diced tomatoes", "400g can kidney beans, drained", "1 tsp cumin", "1 tsp smoked paprika", "\u00bd tsp chilli powder (adjust to taste)", "1 beef stock cube + 100ml water", "Salt and pepper", "1 microwave rice cup per serve"], "method": ["Add onion and garlic to bowl. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 10g oil. Cook: 3 minutes, 100\u00b0C, Speed 1.", "Add mince. Cook: 7 minutes, 100\u00b0C, Speed 1, Reverse \u2014 break up the mince.", "Add tomatoes, kidney beans, spices, stock cube and water.", "Cook: 20 minutes, 100\u00b0C, Speed 1, Reverse.", "Taste and adjust salt, pepper and chilli. Serve over rice."], "note": "Make a double batch \u2014 it freezes perfectly. Portion into flat zip-lock bags, freeze, then stand up like books in the freezer.", "tags": []}, {"id": "m47", "name": "Chickpea & Spinach Curry (TM31)", "category": "TM31 Meals", "source": "Fuel Up", "kcal": 400, "protein": 18, "carbs": 52, "fat": 9, "fibre": 13, "ingredients": ["1 brown onion, quartered", "3 garlic cloves", "1 tsp fresh ginger", "2 tsp curry powder", "1 tsp cumin", "400g can chickpeas, drained", "400g can diced tomatoes", "200ml light coconut milk", "2 large handfuls baby spinach", "1 stock cube + 100ml water", "1 microwave brown rice cup per serve"], "method": ["Add onion, garlic and ginger. Chop: 5 seconds, Speed 5. Scrape sides.", "Add 10g oil. Cook: 3 minutes, 100\u00b0C, Speed 1.", "Add curry powder and cumin. Cook: 1 minute, 100\u00b0C, Speed 1 (toasts the spices).", "Add chickpeas, tomatoes, coconut milk, stock cube and water.", "Cook: 15 minutes, 100\u00b0C, Speed 1, Reverse.", "Add spinach in the last 2 minutes \u2014 it wilts quickly.", "Serve over rice."], "note": "This is a proper curry at 400 kcal. The high fibre keeps you full for hours. Great batch-cook meal \u2014 makes 3 serves.", "tags": []}, {"id": "m48", "name": "Butter Chicken & Rice", "category": "Packet Meals", "source": "Fuel Up", "kcal": 490, "protein": 42, "carbs": 48, "fat": 10, "fibre": 3, "ingredients": ["400g chicken breast, diced", "1 jar Patak's Butter Chicken sauce", "1 microwave brown rice cup", "1 cup frozen spinach (optional \u2014 adds volume)"], "method": ["Dice chicken into bite-size pieces.", "Spray a non-stick pan with olive oil, heat on medium-high.", "Cook chicken 4\u20135 minutes, stirring, until no longer pink.", "Pour the jar of sauce over. Add frozen spinach if using.", "Stir and simmer on low heat for 10 minutes.", "Microwave rice while it simmers.", "Serve chicken over rice."], "note": "Look for sauces under 100 kcal per 100g. Patak's Butter Chicken or Tikka Masala are solid. Avoid creamy korma \u2014 higher in fat.", "tags": []}, {"id": "m49", "name": "Beef Stroganoff (Packet Sauce)", "category": "Packet Meals", "source": "Fuel Up", "kcal": 470, "protein": 38, "carbs": 42, "fat": 12, "fibre": 3, "ingredients": ["350g lean beef strips or diced beef", "1 packet Continental Beef Stroganoff sauce mix", "300ml water (as per packet)", "1 cup button mushrooms, sliced", "1 serve egg noodles or microwave rice"], "method": ["Cook noodles or rice as per packet. Set aside.", "Spray pan with oil. Cook beef strips on high heat 2\u20133 minutes until browned.", "Add mushrooms, cook 2 minutes more.", "Mix sauce sachet with water as per directions. Pour over beef.", "Stir and simmer 5 minutes until thick.", "Serve over noodles or rice."], "note": "Continental packet sauces are shelf stable and cheap. Buy a few different flavours as backup dinners.", "tags": []}, {"id": "m50", "name": "Lean Beef Tacos (Old El Paso Kit)", "category": "Packet Meals", "source": "Fuel Up", "kcal": 460, "protein": 36, "carbs": 44, "fat": 12, "fibre": 5, "ingredients": ["400g lean beef mince", "1 Old El Paso Taco Kit", "1 cup shredded lettuce", "1 cup low-fat Greek yoghurt (replaces sour cream)", "\u00bd cup frozen corn (microwaved)"], "method": ["Brown the mince in a pan on high heat. Drain any fat.", "Add taco seasoning packet + water as directed. Stir and simmer 5 minutes.", "Warm taco shells in oven or microwave.", "Fill shells with mince, lettuce, corn, and a spoon of Greek yoghurt."], "note": "Greek yoghurt is a perfect sour cream substitute \u2014 same texture, way less fat, more protein. Most people can't tell the difference.", "tags": []}, {"id": "m51", "name": "Chicken Pasta with Jar Sauce", "category": "Packet Meals", "source": "Fuel Up", "kcal": 480, "protein": 40, "carbs": 52, "fat": 8, "fibre": 5, "ingredients": ["80g dried penne or fusilli per serve", "300g chicken breast, diced", "1 jar Leggo's Napolitana or Arrabbiata sauce", "1 cup frozen spinach or zucchini", "Pinch of chilli flakes (optional)", "10g parmesan (optional)"], "method": ["Boil pasta in salted water as per packet (10\u201312 mins). Drain.", "While pasta cooks: spray a pan with oil, cook chicken 5\u20136 minutes.", "Pour jar sauce over chicken, add frozen veg, simmer 5 minutes.", "Add drained pasta to the pan and stir through.", "Sprinkle parmesan if using."], "note": "Weigh your pasta dry \u2014 80g per serve. It looks small dry but nearly doubles when cooked.", "tags": []}, {"id": "m52", "name": "Stir-Fry with Packet Sauce", "category": "Packet Meals", "source": "Fuel Up", "kcal": 420, "protein": 38, "carbs": 38, "fat": 9, "fibre": 6, "ingredients": ["300g chicken breast or lean beef, sliced thin", "1 bag frozen stir-fry vegetables (500g)", "1 sachet Chang's Stir-Fry Sauce (honey soy or black bean)", "1 microwave rice cup"], "method": ["Microwave rice cup for 90 seconds.", "Heat pan or wok on HIGH heat. Spray with oil.", "Cook chicken or beef strips 3\u20134 minutes until browned.", "Add frozen veg \u2014 stir constantly for 3 minutes.", "Pour sauce sachet over. Toss together 1 minute.", "Serve over rice."], "note": "HIGH heat is the secret. You want a proper sizzle. Takes 10 minutes total.", "tags": []}, {"id": "m53", "name": "Lean Lamb & Veg Casserole", "category": "Packet Meals", "source": "Fuel Up", "kcal": 450, "protein": 38, "carbs": 30, "fat": 13, "fibre": 7, "ingredients": ["400g lean lamb leg diced", "1 packet Continental Casserole Base mix", "500ml water", "2 carrots, roughly chopped", "2 celery stalks, roughly chopped", "1 cup frozen peas"], "method": ["Preheat oven to 170\u00b0C.", "Put lamb and chopped veg into an oven-proof pot or baking dish with a lid.", "Mix sachet with water, pour over lamb and veg.", "Put lid on and bake for 1.5 hours.", "Add frozen peas in the last 10 minutes.", "Taste and season. Serve as is."], "note": "10 minutes to prep, then the oven does everything. Great Sunday evening meal \u2014 leftovers for Monday.", "tags": []}, {"id": "m54", "name": "Honey Soy Chicken Thighs", "category": "Packet Meals", "source": "Fuel Up", "kcal": 460, "protein": 40, "carbs": 32, "fat": 14, "fibre": 4, "ingredients": ["500g skinless chicken thighs (or breast if you prefer)", "3 tbsp honey soy marinade (Maggi or Fountain brand)", "1 microwave brown rice cup", "2 cups frozen stir-fry veg or broccoli"], "method": ["Put chicken thighs in a baking dish.", "Pour the honey soy marinade over and turn to coat both sides.", "If you have time, let it sit for 15\u201330 minutes (or overnight in the fridge).", "Preheat oven to 200\u00b0C. Bake for 25\u201330 minutes until golden and cooked through.", "Microwave rice and veg separately.", "Serve chicken over rice with veg on the side. Spoon pan juices over the top."], "note": "Chicken thighs have a bit more fat than breast but they're more forgiving to cook \u2014 harder to dry out. The marinade caramelises in the oven and makes a sticky, flavourful sauce.", "tags": []}, {"id": "m55", "name": "San Choy Bow (Lettuce Cups)", "category": "Packet Meals", "source": "Fuel Up", "kcal": 380, "protein": 34, "carbs": 22, "fat": 14, "fibre": 4, "ingredients": ["400g lean pork or chicken mince", "1 can water chestnuts, drained and roughly chopped", "3 tbsp oyster sauce", "1 tbsp reduced-salt soy sauce", "1 tbsp sesame oil", "2 garlic cloves, crushed (or \u00bd tsp garlic powder)", "3 shallots, sliced", "8 large iceberg lettuce leaves (separated as cups)", "Optional: 1 tsp ginger, sriracha for heat"], "method": ["Separate iceberg lettuce leaves carefully to make cups. Rinse and set aside on a plate.", "Heat a pan on high heat. Spray with oil.", "Cook mince for 5\u20136 minutes, breaking it up, until cooked through.", "Add garlic (and ginger if using). Cook 1 more minute.", "Add water chestnuts, oyster sauce, soy sauce and sesame oil. Stir through for 2 minutes.", "Spoon mince mixture into lettuce cups.", "Top with sliced shallots. Eat like a taco."], "note": "Water chestnuts are in the Asian foods aisle at Woolies or Coles. They add a great crunch. San choy bow is genuinely fun to eat and very low carb \u2014 perfect for a lighter dinner.", "tags": []}, {"id": "m56", "name": "Tuna Pasta Bake", "category": "Packet Meals", "source": "Fuel Up", "kcal": 470, "protein": 38, "carbs": 52, "fat": 10, "fibre": 4, "ingredients": ["150g dried penne or spiral pasta", "2 x 95g cans tuna in springwater, drained", "1 can Campbell's Condensed Cream of Mushroom Soup (no added water)", "\u00bd cup frozen peas", "\u00bd cup frozen corn", "\u00bd cup lite grated cheese", "Salt, pepper, mixed herbs"], "method": ["Preheat oven to 180\u00b0C.", "Cook pasta in boiling salted water for 2 minutes less than the packet says \u2014 it will finish cooking in the oven.", "Drain pasta and put in an oven-proof dish.", "Add the condensed mushroom soup straight from the can (no water) \u2014 it's thick and that's what makes the sauce.", "Add drained tuna, frozen peas and corn. Mix everything together.", "Season with salt, pepper and herbs.", "Sprinkle cheese on top.", "Bake 20\u201325 minutes until golden and bubbling."], "note": "Don't add water to the condensed soup \u2014 it's meant to be thick to make the bake saucy. This feeds 3 people or gives you leftovers for lunch tomorrow. It reheats perfectly.", "tags": []}, {"id": "m57", "name": "Bacon, egg & mushroom bake", "category": "Breakfast", "source": "Keto", "kcal": 486, "protein": 34.0, "carbs": 2.0, "fat": 38.0, "fibre": null, "ingredients": ["6 rashers short-cut bacon", "4 eggs", "200g mushrooms, sliced", "100g cheddar, grated", "3 tbsp cream", "1 tbsp butter", "Salt, pepper, fresh thyme"], "method": ["Fry bacon, lay in baking dish. Saut\u00e9 mushrooms in butter, add on top. Whisk cream into eggs, pour over. Top with cheese. Bake 180\u00b0C for 15 min until just set."], "note": "Eggs provide choline for brain function and selenium for thyroid support. Yolk fats help absorb vitamins D and K. Mushrooms are a rare dietary source of vitamin D \u2014 important for bone density and mood.  Sulphite note: Use butcher bacon or check labels \u2014 some cured bacon contains sulphite preservatives.", "tags": ["Metabolism", "Energy", "Thyroid support"]}, {"id": "m58", "name": "Creamy scrambled eggs with herbs", "category": "Breakfast", "source": "Keto", "kcal": 318, "protein": 20.0, "carbs": 1.0, "fat": 26.0, "fibre": null, "ingredients": ["4 eggs", "2 tbsp cream", "1 tbsp butter", "Fresh parsley or chives", "Salt, pepper", "2 rashers bacon (optional)"], "method": ["Whisk eggs with cream. Melt butter over low heat. Stir slowly with a spatula until just set. Remove while slightly underdone \u2014 residual heat finishes them. Top with herbs."], "note": "Low and slow scrambled eggs in butter deliver choline and tryptophan \u2014 the precursor to serotonin and melatonin. Important for mood stability and sleep quality in menopause.", "tags": ["Brain & mood", "Tryptophan", "Energy"]}, {"id": "m59", "name": "Baked eggs in tomato & cream", "category": "Breakfast", "source": "Keto", "kcal": 320, "protein": 20.0, "carbs": 6.0, "fat": 24.0, "fibre": null, "ingredients": ["4 eggs", "400g tin whole tomatoes", "1 clove garlic", "3 tbsp cream", "30g parmesan, grated", "1 tbsp olive oil", "Salt, pepper, pinch chilli flakes"], "method": ["Saut\u00e9 garlic in oil. Add tomatoes, crush roughly and simmer 5 min. Stir in cream. Make 4 wells, crack in eggs. Cover and cook 6\u20138 min until whites just set. Finish with parmesan."], "note": "Tomatoes cooked in olive oil provide lycopene \u2014 a powerful antioxidant that reduces inflammation linked to menopausal symptoms. Fat significantly increases lycopene absorption, making the cream and oil here functional as well as tasty.  Sulphite note: Mutti and Coles Organic tinned tomatoes are generally sulphite-free.", "tags": ["Oestrogen balance", "Anti-inflammatory", "Metabolism"]}, {"id": "m60", "name": "Tuna & cream cheese stuffed capsicum", "category": "Lunch", "source": "Keto", "kcal": 394, "protein": 34.0, "carbs": 6.0, "fat": 26.0, "fibre": null, "ingredients": ["2 tins tuna in olive oil, drained", "100g cream cheese", "2 large capsicums, halved", "Juice of \u00bd lemon", "Fresh chives or parsley", "Salt, pepper", "Cherry tomatoes to serve"], "method": ["Mix tuna with cream cheese, lemon and herbs until smooth. Season well. Spoon generously into capsicum halves. Serve with cherry tomatoes."], "note": "Capsicum is exceptionally high in vitamin C \u2014 essential for adrenal function and collagen synthesis in menopause. Tuna provides omega-3 for brain and mood. Cream cheese adds rich satiating fat with zero sulphite risk.", "tags": ["Omega-3", "Vitamin C", "Metabolism"]}, {"id": "m61", "name": "Creamy chicken & mushroom soup", "category": "Lunch", "source": "Keto", "kcal": 528, "protein": 38.0, "carbs": 4.0, "fat": 40.0, "fibre": null, "ingredients": ["400g chicken thighs, diced", "200g mushrooms, sliced", "500ml chicken stock", "150ml cream", "1 clove garlic", "1 tbsp butter", "Fresh thyme, salt, pepper"], "method": ["Saut\u00e9 garlic in butter. Brown chicken. Add mushrooms 3 min. Pour in stock, simmer 15 min. Stir in cream, simmer 5 more min. Season well."], "note": "Chicken simmered in stock releases collagen and gelatin supporting joints and gut lining. Cream stabilises blood sugar which directly supports cortisol regulation and sleep quality.  Sulphite note: Stock cubes often contain sulphites. Use homemade or Massel salt-reduced chicken stock.", "tags": ["Sleep", "Adrenal support", "Collagen"]}, {"id": "m62", "name": "Tuna, egg & tomato plate", "category": "Lunch", "source": "Keto", "kcal": 522, "protein": 42.0, "carbs": 3.0, "fat": 38.0, "fibre": null, "ingredients": ["2 tins tuna in olive oil", "4 hard-boiled eggs, halved", "Cherry tomatoes", "60g cheddar or parmesan", "Handful macadamias", "Olive oil, lemon, salt, pepper"], "method": ["Arrange everything on a plate or into containers. Drizzle with olive oil and lemon. No cooking required."], "note": "A no-fuss plate of whole foods. Tuna provides omega-3. Eggs add choline for cognitive function. Tomatoes give lycopene and vitamin C. Olive oil aids absorption of all fat-soluble nutrients.", "tags": ["Omega-3", "Bone support", "Metabolism"]}, {"id": "m63", "name": "Sirloin with garlic herb butter & roasted veg", "category": "Dinner", "source": "Keto", "kcal": 606, "protein": 52.0, "carbs": 5.0, "fat": 42.0, "fibre": null, "ingredients": ["2 sirloin or scotch fillet steaks", "3 tbsp butter, softened", "2 cloves garlic, minced", "2 tbsp fresh parsley", "1 tsp fresh thyme", "200g green beans", "200g cherry tomatoes", "Olive oil, salt, pepper"], "method": ["Mix butter with garlic and herbs, roll in cling wrap and chill. Roast tomatoes and beans at 200\u00b0C for 15 min. Pan-fry steaks in a hot cast iron 3\u20134 min per side. Rest 5 min. Top with a slice of herb butter to melt over."], "note": "Grass-fed beef is one of the best sources of zinc \u2014 essential for hormone synthesis and skin integrity. It also provides heme iron and B12, both commonly depleted in perimenopause. Garlic herb butter adds fat-soluble vitamins A and K.", "tags": ["Iron", "Zinc", "Hormone synthesis"]}, {"id": "m64", "name": "Steak with mustard cream sauce", "category": "Dinner", "source": "Keto", "kcal": 616, "protein": 50.0, "carbs": 5.0, "fat": 44.0, "fibre": null, "ingredients": ["2 rump or sirloin steaks", "150ml cream", "1 tbsp Dijon mustard", "1 clove garlic", "1 tbsp butter", "2 capsicums, roasted", "Salt, pepper"], "method": ["Pan-fry steaks to your liking, rest on a plate. In same pan saut\u00e9 garlic 30 sec. Add cream and mustard, simmer 3\u20134 min until slightly thickened. Spoon over steak with roasted capsicum alongside."], "note": "Mustard contains glucosinolates that support liver detoxification of spent hormones. Cream-based sauces are naturally low carb and sulphite-safe. Roasted capsicum adds vitamin C which improves iron absorption from the steak.  Sulphite note: Maille Dijon is generally safe. Avoid pre-made mustard sauces or flavoured mustards.", "tags": ["Iron", "Metabolism", "Adrenal support"]}, {"id": "m65", "name": "Creamy pepper steak", "category": "Dinner", "source": "Keto", "kcal": 586, "protein": 50.0, "carbs": 2.0, "fat": 42.0, "fibre": null, "ingredients": ["2 scotch fillet or rump steaks", "150ml cream", "1 tbsp cracked black pepper", "1 clove garlic", "1 tbsp butter", "1 tsp Dijon mustard", "50ml beef stock", "Salt"], "method": ["Press cracked pepper firmly into both sides of steaks. Sear in a very hot pan in butter to your liking. Rest steaks. In same pan add garlic, stock, cream and mustard. Simmer 3\u20134 min. Pour over steaks."], "note": "Black pepper contains piperine which significantly boosts absorption of nutrients including B vitamins and selenium. Cream-based pepper sauce skips sulphite-heavy Worcestershire and wine entirely.  Sulphite note: Use homemade beef stock or check labels \u2014 avoid preservative numbers 220\u2013221.", "tags": ["Iron", "Anti-inflammatory", "Metabolism"]}, {"id": "m66", "name": "Slow-cooked lamb with garlic & rosemary", "category": "Dinner", "source": "Keto", "kcal": 518, "protein": 50.0, "carbs": 3.0, "fat": 34.0, "fibre": null, "ingredients": ["600g lamb leg or shoulder, bone-in", "4 cloves garlic, slivered", "Fresh rosemary sprigs", "2 tbsp olive oil", "300g green beans or eggplant", "Salt, pepper"], "method": ["Score lamb all over, press garlic slivers and rosemary into cuts. Rub with olive oil, season generously. Roast at 180\u00b0C \u2014 25 min per 500g for medium. Rest 10 min before carving."], "note": "Lamb is rich in zinc, heme iron and B12. A simple roast needs zero processed ingredients \u2014 one of the most sulphite-safe dinners possible. Rosemary contains rosmarinic acid, a neuroprotective antioxidant.", "tags": ["Iron", "Bone support", "Hormone synthesis"]}, {"id": "m67", "name": "Slow-cooked beef cheeks", "category": "Dinner", "source": "Keto", "kcal": 484, "protein": 52.0, "carbs": 6.0, "fat": 28.0, "fibre": null, "ingredients": ["600g beef cheeks or chuck", "400ml beef stock", "400g tin crushed tomatoes", "1 clove garlic", "1 tbsp tomato paste", "Fresh thyme, bay leaf", "1 tbsp butter", "Salt, pepper"], "method": ["Sear beef all over in butter until browned. Add all remaining ingredients. Cover and cook 150\u00b0C for 3 hrs. Sauce thickens naturally. Serve with roasted green beans or eggplant."], "note": "Beef cheeks are collagen-dense \u2014 long slow cooking converts it to gelatin, supporting joints and gut lining. No wine needed; stock and tomato develop deep flavour naturally. Genuinely therapeutic for joint pain.  Sulphite note: No wine in this recipe. Avoid stock with preservative 220 or 221 on label.", "tags": ["Bone & joint", "Iron", "Collagen"]}, {"id": "m68", "name": "Butter chicken (from scratch)", "category": "Dinner", "source": "Keto", "kcal": 610, "protein": 42.0, "carbs": 7.0, "fat": 46.0, "fibre": null, "ingredients": ["500g chicken thighs, diced", "200ml cream", "2 tbsp butter", "400g tin crushed tomatoes", "1 clove garlic", "1 tsp turmeric", "1 tsp cumin", "\u00bd tsp paprika", "\u00bd tsp fresh ginger, grated", "Salt"], "method": ["Brown chicken in butter. Add garlic, ginger and spices, stir 1 min. Add tomatoes, simmer 10 min. Stir in cream, simmer 5 min until sauce thickens. Taste and adjust seasoning."], "note": "Turmeric and ginger reduce systemic inflammation which worsens joint pain and hot flushes. Made entirely from individual spices \u2014 completely sulphite and additive-free. Cream and butter make it genuinely satiating.  Sulphite note: Always use individual spices \u2014 pre-made curry powders and pastes commonly contain sulphites.", "tags": ["Anti-inflammatory", "Adrenal support", "Metabolism"]}, {"id": "m69", "name": "Creamy veggie bake with cream cheese sauce", "category": "Dinner", "source": "Keto", "kcal": 446, "protein": 16.0, "carbs": 10.0, "fat": 38.0, "fibre": null, "ingredients": ["1 eggplant, sliced", "2 capsicums, sliced", "1 leek, sliced (white part)", "150g green beans", "150g cream cheese", "100ml cream", "50g parmesan, grated", "1 clove garlic", "1 tbsp butter", "Salt, pepper, dried Italian herbs"], "method": ["Roast veg with olive oil at 200\u00b0C for 20 min. Melt butter, add garlic, then cream cheese and cream \u2014 stir until smooth. Layer veg in baking dish, pour sauce over, top with parmesan. Bake 180\u00b0C for 15 min."], "note": "Cream cheese sauce is naturally low carb and sulphite-free. High-fibre keto vegetables support gut bacteria diversity, important for oestrogen metabolism. Parmesan adds calcium and vitamin K2 for bone support.", "tags": ["Bone support", "Anti-inflammatory", "Oestrogen balance"]}, {"id": "m70", "name": "White fish with garlic butter & beans", "category": "Dinner", "source": "Keto", "kcal": 384, "protein": 38.0, "carbs": 4.0, "fat": 24.0, "fibre": null, "ingredients": ["2 white fish fillets (barramundi, flathead or snapper)", "3 tbsp butter", "2 cloves garlic, minced", "Juice of \u00bd lemon", "2 tbsp fresh parsley", "200g green beans", "Salt, pepper"], "method": ["Blanch green beans until just tender. Pat fish dry, season well. Cook in butter 3\u20134 min per side. Add garlic and lemon in the final minute. Spoon the butter over to serve."], "note": "White fish provides iodine \u2014 critical for thyroid function which often shifts in menopause, affecting weight and energy. Simple garlic butter has zero sulphite risk and delivers fat-soluble vitamins alongside flavour.", "tags": ["Omega-3", "Thyroid support", "Bone support"]}, {"id": "m71", "name": "Baked parmesan crisps", "category": "Snacks & cheese", "source": "Keto", "kcal": 174, "protein": 12.0, "carbs": 0.0, "fat": 14.0, "fibre": null, "ingredients": ["100g parmesan, finely grated", "Optional: cracked pepper, smoked paprika, or dried rosemary"], "method": ["Preheat oven to 200\u00b0C. Line a tray with baking paper. Place small mounds (1 heaped tsp each) well apart, flatten slightly. Bake 6\u20138 min until golden and lacy. Cool completely before removing \u2014 they crisp as they cool."], "note": "Parmesan is one of the highest calcium cheeses and contains meaningful vitamin K2 \u2014 the nutrient that directs calcium into bone rather than soft tissue. Virtually zero carbs. Make a batch and keep in an airtight container for up to 3 days.", "tags": ["Bone support", "Calcium", "Vitamin K2"]}, {"id": "m72", "name": "Cream cheese dip with capsicum sticks", "category": "Snacks & cheese", "source": "Keto", "kcal": 242, "protein": 6.0, "carbs": 5.0, "fat": 22.0, "fibre": null, "ingredients": ["150g cream cheese, softened", "1 tbsp sour cream", "1 clove garlic, minced", "1 tbsp fresh chives or parsley", "Salt, pepper", "2 capsicums, cut into strips", "Cherry tomatoes to serve"], "method": ["Beat cream cheese with sour cream, garlic and herbs until smooth. Season well. Serve with capsicum strips and tomatoes. Keeps in fridge for 3 days."], "note": "Cream cheese provides fat-soluble vitamins A and D. Capsicum contains more vitamin C per gram than citrus \u2014 important for adrenal support and collagen synthesis. Keeps in the fridge for 3 days.", "tags": ["Bone support", "Vitamin C", "Adrenal support"]}, {"id": "m73", "name": "Mini bacon & cheese frittatas", "category": "Snacks & cheese", "source": "Keto", "kcal": 344, "protein": 22.0, "carbs": 1.0, "fat": 28.0, "fibre": null, "ingredients": ["6 eggs", "4 rashers bacon, diced", "80g cheddar, grated", "3 tbsp cream", "2 tbsp cream cheese", "Salt, pepper", "Optional: diced capsicum, fresh herbs"], "method": ["Preheat oven 180\u00b0C. Grease a 12-hole muffin tin well. Fry bacon briefly. Whisk eggs, cream and cream cheese. Stir in bacon, most of the cheese and any extras. Fill muffin holes \u00be full. Top with remaining cheese. Bake 15\u201318 min until puffed and golden."], "note": "Make 12 on Sunday and you have snacks all week. Eggs and cheese together deliver calcium, choline, B12 and complete protein. They reheat in 60 seconds and are endlessly customisable.  Sulphite note: Check bacon labels \u2014 use butcher bacon or sulphite-free brands where possible.", "tags": ["Metabolism", "Bone support", "Energy"]}, {"id": "m74", "name": "Almond & macadamia fat bombs", "category": "Snacks & cheese", "source": "Keto", "kcal": 236, "protein": 3.0, "carbs": 2.0, "fat": 24.0, "fibre": null, "ingredients": ["100g macadamias, blitzed", "2 tbsp almond butter (100% almonds)", "3 tbsp coconut oil, melted", "1 tbsp cacao powder", "Pinch sea salt", "Stevia or monk fruit to taste"], "method": ["Blitz macadamias to a rough crumb. Mix in all remaining ingredients. Roll into balls (approx 12). Refrigerate 30 min until firm. Store in fridge. Serving = 2 balls."], "note": "Macadamias are high in palmitoleic acid supporting insulin sensitivity \u2014 important when oestrogen decline affects blood sugar. Almond butter adds vitamin E. Coconut oil MCTs provide fast ketone energy, helpful for brain fog.  Sulphite note: Use plain 100% almond butter with no preservatives listed.", "tags": ["Metabolism", "Energy", "Hormone balance"]}, {"id": "m75", "name": "Magnesium seed mix & cinnamon tonic", "category": "Snacks & cheese", "source": "Keto", "kcal": 188, "protein": 7.0, "carbs": 4.0, "fat": 16.0, "fibre": null, "ingredients": ["SEED MIX: 30g pumpkin seeds, 20g sunflower seeds, pinch sea salt", "TONIC: 200ml So Good almond or coconut milk, \u00bc tsp cinnamon, pinch nutmeg, stevia to taste"], "method": ["Toast seeds in a dry pan 3\u20134 min. Store in a jar. Warm milk gently (don't boil), whisk in cinnamon and nutmeg. Drink 30 min before bed."], "note": "Pumpkin seeds are one of the richest dietary sources of magnesium \u2014 essential for sleep onset, muscle relaxation and bone density. The warm cinnamon tonic stabilises blood sugar overnight, reducing cortisol spikes that cause night waking.", "tags": ["Sleep", "Bone support", "Nervous system"]}, {"id": "m76", "name": "Cheese, egg & tomato plate", "category": "Snacks & cheese", "source": "Keto", "kcal": 408, "protein": 18.0, "carbs": 3.0, "fat": 36.0, "fibre": null, "ingredients": ["2 hard-boiled eggs, halved", "60g aged cheddar or parmesan", "Cherry tomatoes", "Handful macadamias", "Olive oil drizzle", "Sea salt, cracked pepper"], "method": ["Arrange on a plate or board. Season well. Drizzle with olive oil. No cooking needed."], "note": "Aged hard cheese contains calcium and vitamin K2 \u2014 directing calcium into bones, not soft tissue. Hard-boiled eggs provide complete protein and choline for cognitive function. Cherry tomatoes add vitamin C and lycopene.", "tags": ["Bone support", "Hormone synthesis", "Energy"]}, {"id": "m77", "name": "Chocolate protein shake", "category": "Protein shakes", "source": "Keto", "kcal": 276, "protein": 38.0, "carbs": 4.0, "fat": 12.0, "fibre": null, "ingredients": ["1.5 scoops whey isolate (chocolate or unflavoured)", "250ml So Good coconut milk", "1 tbsp cacao powder", "1 tsp cinnamon", "Pinch sea salt", "3\u20134 ice cubes", "Stevia if needed"], "method": ["Blend all ingredients 30 seconds until smooth and frothy. Drink immediately for best texture."], "note": "Whey isolate is the gold standard for leucine \u2014 the amino acid that triggers muscle protein synthesis, critical for preserving muscle mass as oestrogen declines. Cacao adds magnesium and flavonoids. Coconut milk MCTs support mental clarity.", "tags": ["Muscle mass", "Bone & joint", "Brain support"]}, {"id": "m78", "name": "Vanilla almond breakfast shake", "category": "Protein shakes", "source": "Keto", "kcal": 302, "protein": 40.0, "carbs": 4.0, "fat": 14.0, "fibre": null, "ingredients": ["1.5 scoops vanilla whey isolate", "250ml So Good almond milk", "1 tbsp almond butter (100% almonds)", "\u00bd tsp vanilla extract", "\u00bc tsp cinnamon", "3\u20134 ice cubes"], "method": ["Blend all ingredients until smooth. For a thicker shake add more ice. Drink within 20 min of making."], "note": "A protein-first breakfast stabilises cortisol and blood sugar from the moment you wake \u2014 particularly important in menopause when insulin sensitivity shifts. Works as a full breakfast on busy mornings without compromising ketosis.  Sulphite note: Unflavoured or naturally flavoured whey isolate is lowest risk for additives.", "tags": ["Metabolism", "Energy", "Blood sugar balance"]}, {"id": "m79", "name": "Creamy coconut & cinnamon shake", "category": "Protein shakes", "source": "Keto", "kcal": 206, "protein": 26.0, "carbs": 3.0, "fat": 10.0, "fibre": null, "ingredients": ["1 scoop whey isolate (vanilla or unflavoured)", "150ml So Good coconut milk", "50ml water", "\u00bd tsp cinnamon", "Pinch nutmeg", "Stevia to taste", "3 ice cubes"], "method": ["Shake in a shaker bottle or blend briefly. Serve cold."], "note": "A gentler, lower-stimulant shake suited to evenings or rest days. Coconut milk adds MCTs and satiating fat. Cinnamon helps regulate blood sugar overnight. Whey taken in the evening supports overnight muscle repair.", "tags": ["Sleep", "Metabolism", "Adrenal support"]}, {"id": "m80", "name": "Berry & almond power shake", "category": "Protein shakes", "source": "Keto", "kcal": 292, "protein": 38.0, "carbs": 8.0, "fat": 12.0, "fibre": null, "ingredients": ["1.5 scoops vanilla whey isolate", "200ml So Good almond milk", "60g frozen blueberries or raspberries", "1 tbsp almond butter", "3 ice cubes", "Stevia if needed"], "method": ["Blend all ingredients until smooth and thick. Frozen berries make this naturally cold and creamy without much ice."], "note": "Frozen blueberries and raspberries are low-carb berries packed with anthocyanins \u2014 antioxidants shown to support cognitive function and reduce inflammation. One of the few fruits that fits keto in small amounts.", "tags": ["Oestrogen balance", "Anti-inflammatory", "Brain support"]}];
+
+  function todayStr(){
+    const d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  function defaultData(){
+    return {
+      settings:{
+        stepsTarget: 8000,
+        ketoMode: false,
+        targets:{
+          standard:{ calories:2000, protein:160, carbs:200, fat:65, fibre:30 },
+          keto:{ calories:1800, protein:140, carbs:30, fat:130, fibre:25 }
+        },
+        statsSetup:{ done:false, weightKg:null, goalWeightKg:null, activityLevel:'moderate' }
+      },
+      weightLog: [],
+      missions: {},
+      nutritionLog: {}, // date -> { entries:[{id,name,cal,protein,carbs,fat,fibre}] }
+      programs: [], // {id,name,exercises:[{id,name,type}]}
+      activeSession: null, // {id,programId,programName,startedAt,exercises:[...]}
+      workoutHistory: [], // {id,date,programName,startedAt,finishedAt,exercises:[...]}
+      prs: {}, // exerciseNameLower -> best record
+      progressPhotos: {}, // date -> {front,side,back} each a compressed data URL or null
+      streak: 0
+    };
+  }
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultData();
+      const parsed = JSON.parse(raw);
+      const merged = Object.assign(defaultData(), parsed);
+      merged.settings = Object.assign(defaultData().settings, parsed.settings || {});
+      merged.settings.targets = Object.assign(defaultData().settings.targets, (parsed.settings && parsed.settings.targets) || {});
+      merged.settings.statsSetup = Object.assign(defaultData().settings.statsSetup, (parsed.settings && parsed.settings.statsSetup) || {});
+      return merged;
+    }catch(e){
+      console.error('Forge Life: failed to load data, starting fresh', e);
+      return defaultData();
+    }
+  }
+
+  function save(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      console.error('Forge Life: failed to save data', e);
+    }
+  }
+
+  let state = load();
+
+  function getActiveTargets(){
+    return state.settings.targets[state.settings.ketoMode ? 'keto' : 'standard'];
+  }
+
+  // Simple bodyweight-based estimate (not a medical calculation).
+  // Maintenance ~ weight x activity factor, then a moderate deficit for weight loss.
+  function computeTargetsFromStats(weightKg, activityLevel){
+    const factors = { sedentary:24, light:27, moderate:30, active:34 };
+    const factor = factors[activityLevel] || factors.moderate;
+    const maintenance = weightKg * factor;
+    const calories = Math.max(1500, Math.round(maintenance - 500));
+    const protein = Math.round(weightKg * 2);
+
+    // Standard split
+    const stdFatCals = calories * 0.30;
+    const stdProteinCals = protein * 4;
+    const stdCarbCals = Math.max(0, calories - stdProteinCals - stdFatCals);
+    const standard = {
+      calories,
+      protein,
+      fat: Math.round(stdFatCals / 9),
+      carbs: Math.max(50, Math.round(stdCarbCals / 4)),
+      fibre: Math.round(14 * calories / 1000)
+    };
+
+    // Keto split — same calories/protein, high fat, low carb
+    const ketoFatCals = calories * 0.75;
+    const ketoProteinCals = protein * 4;
+    const ketoCarbCals = Math.max(0, calories - ketoProteinCals - ketoFatCals);
+    const keto = {
+      calories,
+      protein,
+      fat: Math.round(ketoFatCals / 9),
+      carbs: Math.max(20, Math.round(ketoCarbCals / 4)),
+      fibre: Math.round(11 * calories / 1000)
+    };
+
+    return { standard, keto };
+  }
+
+  function getTodayMission(){
+    const t = todayStr();
+    if(!state.missions[t]){
+      state.missions[t] = { steps:0, workoutDone:false, waterMl:0 };
+    }
+    return state.missions[t];
+  }
+
+  function getTodayNutrition(){
+    const t = todayStr();
+    if(!state.nutritionLog[t]){
+      state.nutritionLog[t] = { entries: [] };
+    }
+    return state.nutritionLog[t];
+  }
+
+  function getTodayTotals(){
+    const n = getTodayNutrition();
+    return n.entries.reduce((acc, e)=>{
+      acc.cal += e.cal; acc.protein += e.protein; acc.carbs += e.carbs; acc.fat += e.fat; acc.fibre += e.fibre;
+      return acc;
+    }, {cal:0, protein:0, carbs:0, fat:0, fibre:0});
+  }
+
+  function missionComplete(m, proteinTotal, proteinTarget){
+    return m.steps >= state.settings.stepsTarget &&
+           m.workoutDone === true &&
+           m.waterMl >= 3000 &&
+           proteinTotal >= proteinTarget;
+  }
+
+  function recalcStreak(){
+    let streak = 0;
+    let cursor = new Date();
+    cursor.setDate(cursor.getDate() - 1);
+    while(true){
+      const key = cursor.getFullYear()+'-'+String(cursor.getMonth()+1).padStart(2,'0')+'-'+String(cursor.getDate()).padStart(2,'0');
+      const m = state.missions[key];
+      const n = state.nutritionLog[key];
+      const proteinTotal = n ? n.entries.reduce((s,e)=>s+e.protein,0) : 0;
+      if(m && missionComplete(m, proteinTotal, getActiveTargets().protein)){
+        streak++;
+        cursor.setDate(cursor.getDate()-1);
+      } else {
+        break;
+      }
+    }
+    const t = getTodayMission();
+    const totals = getTodayTotals();
+    if(missionComplete(t, totals.protein, getActiveTargets().protein)) streak++;
+    state.streak = streak;
+  }
+
+  function countSessionsThisWeek(){
+    let count = 0;
+    const now = new Date();
+    const day = now.getDay(); // 0=Sun
+    const monday = new Date(now);
+    const diffToMonday = (day === 0 ? 6 : day - 1);
+    monday.setDate(now.getDate() - diffToMonday);
+    for(let i=0;i<7;i++){
+      const d = new Date(monday);
+      d.setDate(monday.getDate()+i);
+      const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      const m = state.missions[key];
+      if(m && m.workoutDone) count++;
+    }
+    return count;
+  }
+
+  // ---------- Top-level nav ----------
+  const tabButtons = document.querySelectorAll('nav.tabbar button');
+  tabButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      tabButtons.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      const target = document.getElementById('view-'+btn.dataset.view);
+      if(target) target.classList.add('active');
+      if(btn.dataset.view === 'more') showMoreMenu();
+      if(btn.dataset.view === 'nutrition') renderNutrition();
+      if(btn.dataset.view === 'workouts'){ showWorkoutsHome(); renderWorkouts(); }
+      if(btn.dataset.view === 'history') renderHistory();
+    });
+  });
+
+  function showMoreMenu(){
+    document.getElementById('moreMenu').style.display = 'block';
+    document.getElementById('moreWeight').style.display = 'none';
+    document.getElementById('morePhotos').style.display = 'none';
+    document.getElementById('moreSchedule').style.display = 'none';
+    document.getElementById('moreProgression').style.display = 'none';
+  }
+  function showMoreSection(target){
+    document.getElementById('moreMenu').style.display = 'none';
+    document.getElementById('moreWeight').style.display = target === 'weight' ? 'block' : 'none';
+    document.getElementById('morePhotos').style.display = target === 'photos' ? 'block' : 'none';
+    document.getElementById('moreSchedule').style.display = target === 'schedule' ? 'block' : 'none';
+    document.getElementById('moreProgression').style.display = target === 'progression' ? 'block' : 'none';
+    if(target === 'weight') renderWeightChart();
+    if(target === 'photos') renderPhotosSection();
+  }
+  document.querySelectorAll('.menu-item[data-target]').forEach(btn=>{
+    btn.addEventListener('click', ()=> showMoreSection(btn.dataset.target));
+  });
+  document.querySelectorAll('.back-row').forEach(el=>{
+    el.addEventListener('click', showMoreMenu);
+  });
+
+  // ---------- Header / greeting ----------
+  function renderHeaderAndGreeting(){
+    const now = new Date();
+    document.getElementById('headerDay').textContent = DAY_NAMES[now.getDay()];
+    const hour = now.getHours();
+    const greet = hour < 12 ? 'Good morning' : (hour < 17 ? 'Good afternoon' : 'Good evening');
+    document.getElementById('greetingText').textContent = greet + ' 💪';
+    document.getElementById('greetingDate').textContent = now.getDate()+' '+MONTH_NAMES[now.getMonth()]+' '+now.getFullYear();
+  }
+
+  // ---------- Dashboard render ----------
+  function renderDashboard(){
+    const log = state.weightLog.slice().sort((a,b)=> a.date.localeCompare(b.date));
+    const dashNum = document.getElementById('dashWeightNum');
+    const dashSub = document.getElementById('dashWeightSub');
+    if(log.length === 0){
+      dashNum.innerHTML = '-- <small>kg</small>';
+      dashSub.textContent = 'No weigh-ins logged yet — add one under More → Weight Tracker';
+    } else {
+      const latest = log[log.length-1];
+      dashNum.innerHTML = latest.kg.toFixed(1)+' <small>kg</small>';
+      const daysAgo = Math.round((new Date(todayStr()) - new Date(latest.date)) / 86400000);
+      const agoText = daysAgo <= 0 ? 'today' : (daysAgo === 1 ? '1 day ago' : daysAgo < 14 ? daysAgo+' days ago' : Math.round(daysAgo/7)+'w ago');
+      let trendText = '';
+      if(log.length > 1){
+        const prev = log[log.length-2];
+        const diff = latest.kg - prev.kg;
+        trendText = diff === 0 ? '→ no change' : (diff < 0 ? '↓ '+Math.abs(diff).toFixed(1)+'kg' : '↑ '+diff.toFixed(1)+'kg');
+      }
+      dashSub.textContent = 'Logged '+agoText+(trendText ? ' · '+trendText : '');
+    }
+
+    const m = getTodayMission();
+    const totals = getTodayTotals();
+    const targets = getActiveTargets();
+
+    document.getElementById('stepsTargetLabel').textContent = state.settings.stepsTarget;
+    document.getElementById('stepsProgress').textContent = m.steps;
+    document.getElementById('stepsInput').value = '';
+    document.getElementById('checkSteps').classList.toggle('done', m.steps >= state.settings.stepsTarget);
+
+    document.getElementById('checkWorkout').classList.toggle('done', m.workoutDone);
+    document.getElementById('workoutStatus').textContent = m.workoutDone ? 'Done ✓' : 'Rest day';
+    document.getElementById('workoutSub').textContent = m.workoutDone ? 'Logged today' : 'No session yet';
+
+    document.getElementById('sessionsThisWeek').textContent = countSessionsThisWeek()+' sessions this week';
+
+    document.getElementById('waterProgress').textContent = (m.waterMl/1000).toFixed(1);
+    document.getElementById('checkWater').classList.toggle('done', m.waterMl >= 3000);
+    renderWaterTrack(m);
+
+    document.getElementById('proteinTargetLabel').textContent = targets.protein;
+    document.getElementById('proteinMissionProgress').textContent = totals.protein;
+    document.getElementById('checkProtein').classList.toggle('done', totals.protein >= targets.protein);
+
+    recalcStreak();
+    document.getElementById('streakCount').textContent = state.streak;
+
+    document.getElementById('ketoToggle').classList.toggle('on', state.settings.ketoMode);
+
+    renderNutritionSummary('calProgress','calTarget','calFill','proteinVal','proteinBar','carbsVal','carbsBar','fatVal','fatBar','fibreVal','fibreBar', totals, targets);
+  }
+
+  function renderNutritionSummary(calP,calT,calF,pV,pB,cV,cB,fV,fB,fiV,fiB, totals, targets){
+    document.getElementById(calP).textContent = totals.cal;
+    document.getElementById(calT).textContent = targets.calories;
+    document.getElementById(calF).style.width = Math.min(100, (totals.cal/targets.calories)*100)+'%';
+    document.getElementById(pV).textContent = totals.protein+'g';
+    document.getElementById(pB).style.width = Math.min(100, (totals.protein/targets.protein)*100)+'%';
+    document.getElementById(cV).textContent = totals.carbs+'g';
+    document.getElementById(cB).style.width = Math.min(100, (totals.carbs/targets.carbs)*100)+'%';
+    document.getElementById(fV).textContent = totals.fat+'g';
+    document.getElementById(fB).style.width = Math.min(100, (totals.fat/targets.fat)*100)+'%';
+    document.getElementById(fiV).textContent = totals.fibre+'g';
+    document.getElementById(fiB).style.width = Math.min(100, (totals.fibre/targets.fibre)*100)+'%';
+  }
+
+  function renderWaterTrack(m){
+    const waterTrack = document.getElementById('waterTrack');
+    waterTrack.innerHTML = '';
+    const filledSegments = Math.min(WATER_SEGMENTS, Math.round(m.waterMl/250));
+    for(let i=0;i<WATER_SEGMENTS;i++){
+      const seg = document.createElement('button');
+      seg.type = 'button';
+      seg.className = 'water-drop' + (i < filledSegments ? ' filled' : '');
+      seg.dataset.index = i;
+      seg.title = ((i+1)*250)+'ml';
+      waterTrack.appendChild(seg);
+    }
+  }
+
+  document.getElementById('waterTrack').addEventListener('click', (e)=>{
+    const seg = e.target.closest('.water-drop');
+    if(!seg) return;
+    const idx = parseInt(seg.dataset.index, 10);
+    const m = getTodayMission();
+    const currentFilled = Math.round(m.waterMl/250);
+    if(currentFilled === idx+1){
+      m.waterMl = idx*250;
+    } else {
+      m.waterMl = (idx+1)*250;
+    }
+    save();
+    renderDashboard();
+  });
+
+  document.getElementById('checkSteps').addEventListener('click', ()=>{
+    const m = getTodayMission();
+    m.steps = m.steps >= state.settings.stepsTarget ? 0 : state.settings.stepsTarget;
+    save(); renderDashboard();
+  });
+  document.getElementById('checkWorkout').addEventListener('click', ()=>{
+    const m = getTodayMission();
+    m.workoutDone = !m.workoutDone;
+    save(); renderDashboard();
+  });
+  document.getElementById('checkWater').addEventListener('click', ()=>{
+    const m = getTodayMission();
+    m.waterMl = m.waterMl >= 3000 ? 0 : 3000;
+    save(); renderDashboard();
+  });
+  document.getElementById('stepsInput').addEventListener('change', (e)=>{
+    const val = parseInt(e.target.value, 10);
+    if(!isNaN(val) && val >= 0){
+      getTodayMission().steps = val;
+      save(); renderDashboard();
+    }
+  });
+  document.getElementById('editStepsTarget').addEventListener('click', ()=>{
+    const val = prompt('Set daily steps target', state.settings.stepsTarget);
+    const num = parseInt(val, 10);
+    if(!isNaN(num) && num > 0){
+      state.settings.stepsTarget = num;
+      save(); renderDashboard();
+    }
+  });
+  document.getElementById('ketoToggle').addEventListener('click', ()=>{
+    state.settings.ketoMode = !state.settings.ketoMode;
+    save(); renderDashboard(); renderNutrition();
+  });
+
+  // ---------- Weight modal ----------
+  const weightModal = document.getElementById('weightModal');
+  const weightModalInput = document.getElementById('weightModalInput');
+  function openWeightModal(){
+    weightModalInput.value = '';
+    weightModal.classList.add('open');
+    setTimeout(()=>weightModalInput.focus(), 50);
+  }
+  function closeWeightModal(){ weightModal.classList.remove('open'); }
+  document.getElementById('btnLogWeightTab').addEventListener('click', openWeightModal);
+  document.getElementById('weightModalCancel').addEventListener('click', closeWeightModal);
+  document.getElementById('weightModalSave').addEventListener('click', ()=>{
+    const val = parseFloat(weightModalInput.value);
+    if(!isNaN(val) && val > 0){
+      const t = todayStr();
+      const existing = state.weightLog.find(e=>e.date === t);
+      if(existing){ existing.kg = val; } else { state.weightLog.push({date:t, kg:val}); }
+      save();
+      closeWeightModal();
+      renderDashboard();
+      renderWeightChart();
+    }
+  });
+
+  // ---------- Weight chart + history ----------
+  function renderWeightChart(){
+    const canvas = document.getElementById('weightChart');
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = 180 * dpr;
+    ctx.scale(dpr, dpr);
+    const W = rect.width, H = 180;
+    ctx.clearRect(0,0,W,H);
+
+    const log = state.weightLog.slice().sort((a,b)=> a.date.localeCompare(b.date));
+    const listEl = document.getElementById('weightLogList');
+    const emptyNote = document.getElementById('weightEmptyNote');
+    listEl.innerHTML = '';
+
+    if(log.length === 0){
+      emptyNote.style.display = 'block';
+      ctx.fillStyle = '#9A938A';
+      ctx.font = '13px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('No data yet', W/2, H/2);
+      return;
+    }
+    emptyNote.style.display = 'none';
+
+    log.slice().reverse().forEach(entry=>{
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="l-date">'+entry.date+'</span><span class="l-val">'+entry.kg.toFixed(1)+' kg</span><button class="l-del" data-date="'+entry.date+'">remove</button>';
+      listEl.appendChild(li);
+    });
+    listEl.querySelectorAll('.l-del').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        const d = e.target.dataset.date;
+        state.weightLog = state.weightLog.filter(x=>x.date !== d);
+        save();
+        renderDashboard();
+        renderWeightChart();
+      });
+    });
+
+    const pad = 24;
+    const kgs = log.map(e=>e.kg);
+    const min = Math.min(...kgs) - 1;
+    const max = Math.max(...kgs) + 1;
+    const range = (max - min) || 1;
+
+    ctx.strokeStyle = '#E7E0D3';
+    ctx.lineWidth = 1;
+    for(let i=0;i<=3;i++){
+      const y = pad + (H-pad*2) * (i/3);
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.strokeStyle = '#7A1A04';
+    ctx.lineWidth = 2.5;
+    log.forEach((entry, i)=>{
+      const x = log.length === 1 ? W/2 : pad + (W - pad*2) * (i/(log.length-1));
+      const y = pad + (H - pad*2) * (1 - (entry.kg - min)/range);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    log.forEach((entry, i)=>{
+      const x = log.length === 1 ? W/2 : pad + (W - pad*2) * (i/(log.length-1));
+      const y = pad + (H - pad*2) * (1 - (entry.kg - min)/range);
+      ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle = '#7A1A04'; ctx.fill();
+    });
+  }
+
+  window.addEventListener('resize', ()=>{
+    if(document.getElementById('moreWeight').style.display === 'block') renderWeightChart();
+  });
+
+  // ---------- Food modal ----------
+  const foodModal = document.getElementById('foodModal');
+  function openFoodModal(){
+    ['foodName','foodCal','foodProtein','foodCarbs','foodFat','foodFibre'].forEach(id=>document.getElementById(id).value='');
+    foodModal.classList.add('open');
+  }
+  function closeFoodModal(){ foodModal.classList.remove('open'); }
+  document.getElementById('btnLogFoodDash').addEventListener('click', ()=>{
+    tabButtons.forEach(b=>b.classList.remove('active'));
+    document.querySelector('nav.tabbar button[data-view="nutrition"]').classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-nutrition').classList.add('active');
+    renderNutrition();
+    openFoodModal();
+  });
+  document.getElementById('btnLogFoodTab').addEventListener('click', openFoodModal);
+  document.getElementById('foodModalCancel').addEventListener('click', closeFoodModal);
+  document.getElementById('foodModalSave').addEventListener('click', ()=>{
+    const name = document.getElementById('foodName').value.trim() || 'Untitled food';
+    const cal = parseFloat(document.getElementById('foodCal').value) || 0;
+    const protein = parseFloat(document.getElementById('foodProtein').value) || 0;
+    const carbs = parseFloat(document.getElementById('foodCarbs').value) || 0;
+    const fat = parseFloat(document.getElementById('foodFat').value) || 0;
+    const fibre = parseFloat(document.getElementById('foodFibre').value) || 0;
+    const n = getTodayNutrition();
+    n.entries.push({ id: Date.now().toString(36), name, cal, protein, carbs, fat, fibre });
+    save();
+    closeFoodModal();
+    renderDashboard();
+    renderNutrition();
+  });
+
+  // ---------- Targets modal ----------
+  const targetsModal = document.getElementById('targetsModal');
+  document.getElementById('editTargetsBtn').addEventListener('click', ()=>{
+    const targets = getActiveTargets();
+    document.getElementById('targetsModeLabel').textContent = state.settings.ketoMode ? 'Keto' : 'Standard';
+    document.getElementById('targetCal').value = targets.calories;
+    document.getElementById('targetProtein').value = targets.protein;
+    document.getElementById('targetCarbs').value = targets.carbs;
+    document.getElementById('targetFat').value = targets.fat;
+    document.getElementById('targetFibre').value = targets.fibre;
+    targetsModal.classList.add('open');
+  });
+  document.getElementById('targetsModalCancel').addEventListener('click', ()=> targetsModal.classList.remove('open'));
+  document.getElementById('targetsModalSave').addEventListener('click', ()=>{
+    const targets = getActiveTargets();
+    targets.calories = parseInt(document.getElementById('targetCal').value,10) || targets.calories;
+    targets.protein = parseInt(document.getElementById('targetProtein').value,10) || targets.protein;
+    targets.carbs = parseInt(document.getElementById('targetCarbs').value,10) || targets.carbs;
+    targets.fat = parseInt(document.getElementById('targetFat').value,10) || targets.fat;
+    targets.fibre = parseInt(document.getElementById('targetFibre').value,10) || targets.fibre;
+    save();
+    targetsModal.classList.remove('open');
+    renderDashboard();
+    renderNutrition();
+  });
+
+  // ================= WORKOUTS =================
+  let exercisePickerContext = 'session'; // 'session' | 'program'
+  let programBuilderExercises = [];
+  let openHistoryId = null;
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function showWorkoutsHome(){
+    document.getElementById('workoutsHome').style.display = 'block';
+    document.getElementById('workoutSession').style.display = 'none';
+  }
+  function showWorkoutSessionView(){
+    document.getElementById('workoutsHome').style.display = 'none';
+    document.getElementById('workoutSession').style.display = 'block';
+    renderSessionExercises();
+    document.getElementById('sessionTitle').textContent = state.activeSession.programName || 'Freestyle Workout';
+  }
+
+  function cloneExerciseForSession(e){
+    const base = { id: uid(), name: e.name, type: e.type, notes: '' };
+    if(e.type === 'cardio'){ base.cardio = { durationMin:'', distanceKm:'', calories:'' }; }
+    else { base.sets = []; }
+    return base;
+  }
+
+  function startSession(program){
+    if(state.activeSession){
+      alert('Finish or discard your current workout before starting a new one.');
+      return;
+    }
+    state.activeSession = {
+      id: uid(),
+      programId: program ? program.id : null,
+      programName: program ? program.name : 'Freestyle Workout',
+      startedAt: new Date().toISOString(),
+      exercises: program ? program.exercises.map(cloneExerciseForSession) : []
+    };
+    save();
+    renderWorkouts();
+    showWorkoutSessionView();
+  }
+
+  document.getElementById('btnStartFreestyle').addEventListener('click', ()=> startSession(null));
+  document.getElementById('btnResumeSession').addEventListener('click', ()=> showWorkoutSessionView());
+
+  document.getElementById('btnDiscardSession').addEventListener('click', ()=>{
+    if(confirm('Discard this workout? This can\'t be undone.')){
+      state.activeSession = null;
+      save();
+      showWorkoutsHome();
+      renderWorkouts();
+    }
+  });
+
+  function recomputeAllPRs(){
+    state.prs = {};
+    state.workoutHistory.forEach(session=>{
+      session.exercises.forEach(ex=> applyExerciseToPRs(ex));
+    });
+  }
+
+  function applyExerciseToPRs(ex){
+    const key = ex.name.trim().toLowerCase();
+    if(!key) return;
+    if(ex.type === 'strength' && ex.sets){
+      ex.sets.forEach(s=>{
+        const w = parseFloat(s.weightKg) || 0;
+        const r = parseInt(s.reps,10) || 0;
+        if(w <= 0) return;
+        const cur = state.prs[key];
+        if(!cur || cur.type !== 'strength' || w > cur.weightKg || (w === cur.weightKg && r > cur.reps)){
+          state.prs[key] = { type:'strength', name: ex.name, weightKg: w, reps: r };
+        }
+      });
+    } else if(ex.type === 'cardio' && ex.cardio){
+      const dur = parseFloat(ex.cardio.durationMin) || 0;
+      if(dur <= 0) return;
+      const cur = state.prs[key];
+      if(!cur || cur.type !== 'cardio' || dur > cur.durationMin){
+        state.prs[key] = {
+          type:'cardio', name: ex.name, durationMin: dur,
+          distanceKm: parseFloat(ex.cardio.distanceKm) || null,
+          calories: parseInt(ex.cardio.calories,10) || null
+        };
+      }
+    } else if(ex.type === 'core' && ex.sets){
+      ex.sets.forEach(s=>{
+        const r = parseInt(s.reps,10) || 0;
+        const h = parseInt(s.holdSec,10) || 0;
+        const cur = state.prs[key];
+        if(r > 0){
+          if(!cur || cur.type !== 'core' || cur.metric !== 'reps' || r > cur.reps){
+            state.prs[key] = { type:'core', name: ex.name, metric:'reps', reps: r };
+          }
+        } else if(h > 0){
+          if(!cur || cur.type !== 'core' || cur.metric !== 'hold' || h > cur.holdSec){
+            state.prs[key] = { type:'core', name: ex.name, metric:'hold', holdSec: h };
+          }
+        }
+      });
+    }
+  }
+
+  document.getElementById('btnFinishSession').addEventListener('click', ()=>{
+    const session = state.activeSession;
+    if(!session) return;
+    if(session.exercises.length === 0){
+      alert('Add at least one exercise before finishing.');
+      return;
+    }
+    session.finishedAt = new Date().toISOString();
+    session.date = todayStr();
+    state.workoutHistory.push(session);
+    recomputeAllPRs();
+    getTodayMission().workoutDone = true;
+    state.activeSession = null;
+    save();
+    showWorkoutsHome();
+    renderWorkouts();
+    renderDashboard();
+    renderHistory();
+  });
+
+  // ---------- Session exercise rendering ----------
+  function renderSessionExercises(){
+    const session = state.activeSession;
+    const gridEl = document.getElementById('sessionExerciseList');
+    if(!session){ gridEl.innerHTML = ''; return; }
+
+    gridEl.innerHTML = session.exercises.map(ex=>{
+      let bodyHtml = '';
+      if(ex.type === 'cardio'){
+        bodyHtml = '<div style="display:flex; gap:8px;">'
+          + '<div style="flex:1;"><span class="field-label" style="margin:0 0 4px;">Duration (min)</span><input type="number" class="set-input" data-field="durationMin" data-ex-id="'+ex.id+'" value="'+(ex.cardio.durationMin||'')+'"></div>'
+          + '<div style="flex:1;"><span class="field-label" style="margin:0 0 4px;">Distance (km)</span><input type="number" step="0.1" class="set-input" data-field="distanceKm" data-ex-id="'+ex.id+'" value="'+(ex.cardio.distanceKm||'')+'"></div>'
+          + '<div style="flex:1;"><span class="field-label" style="margin:0 0 4px;">Calories</span><input type="number" class="set-input" data-field="calories" data-ex-id="'+ex.id+'" value="'+(ex.cardio.calories||'')+'"></div>'
+          + '</div>';
+      } else {
+        const isCore = ex.type === 'core';
+        const setsHtml = ex.sets.map((s,i)=>{
+          if(isCore){
+            return '<div class="set-row"><span class="set-num">'+(i+1)+'</span>'
+              + '<input type="number" class="set-input" placeholder="reps" data-set-field="reps" data-ex-id="'+ex.id+'" data-set-idx="'+i+'" value="'+(s.reps||'')+'">'
+              + '<input type="number" class="set-input" placeholder="hold sec" data-set-field="holdSec" data-ex-id="'+ex.id+'" data-set-idx="'+i+'" value="'+(s.holdSec||'')+'">'
+              + '<button class="set-del" data-del-set="'+i+'" data-ex-id="'+ex.id+'">✕</button></div>';
+          }
+          return '<div class="set-row"><span class="set-num">'+(i+1)+'</span>'
+            + '<input type="number" step="0.5" class="set-input" placeholder="kg" data-set-field="weightKg" data-ex-id="'+ex.id+'" data-set-idx="'+i+'" value="'+(s.weightKg||'')+'">'
+            + '<input type="number" class="set-input" placeholder="reps" data-set-field="reps" data-ex-id="'+ex.id+'" data-set-idx="'+i+'" value="'+(s.reps||'')+'">'
+            + '<button class="set-del" data-del-set="'+i+'" data-ex-id="'+ex.id+'">✕</button></div>';
+        }).join('');
+        bodyHtml = setsHtml + '<button class="add-set-btn" data-add-set="'+ex.id+'">+ Add Set</button>';
+      }
+      return '<div class="exercise-card">'
+        + '<div class="exercise-card-head">'
+        +   '<div><div class="exercise-name">'+ex.name+'</div><span class="type-chip '+ex.type+'">'+ex.type+'</span></div>'
+        +   '<button class="remove-exercise-btn" data-remove-ex="'+ex.id+'">Remove</button>'
+        + '</div>'
+        + bodyHtml
+        + '<textarea class="exercise-notes" placeholder="Notes (optional)" data-notes-ex="'+ex.id+'">'+(ex.notes||'')+'</textarea>'
+      + '</div>';
+    }).join('') || '<div class="empty-note">No exercises yet — tap + Add Exercise above.</div>';
+
+    gridEl.querySelectorAll('[data-remove-ex]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.activeSession.exercises = state.activeSession.exercises.filter(x=>x.id !== btn.dataset.removeEx);
+        save();
+        renderSessionExercises();
+      });
+    });
+    gridEl.querySelectorAll('[data-add-set]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const ex = state.activeSession.exercises.find(x=>x.id === btn.dataset.addSet);
+        if(!ex) return;
+        ex.sets.push(ex.type === 'core' ? {reps:'', holdSec:''} : {weightKg:'', reps:''});
+        save();
+        renderSessionExercises();
+      });
+    });
+    gridEl.querySelectorAll('[data-del-set]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const ex = state.activeSession.exercises.find(x=>x.id === btn.dataset.exId);
+        if(!ex) return;
+        ex.sets.splice(parseInt(btn.dataset.delSet,10),1);
+        save();
+        renderSessionExercises();
+      });
+    });
+    gridEl.querySelectorAll('[data-set-field]').forEach(inp=>{
+      inp.addEventListener('input', ()=>{
+        const ex = state.activeSession.exercises.find(x=>x.id === inp.dataset.exId);
+        if(!ex) return;
+        ex.sets[parseInt(inp.dataset.setIdx,10)][inp.dataset.setField] = inp.value;
+        save();
+      });
+    });
+    gridEl.querySelectorAll('[data-field]').forEach(inp=>{
+      inp.addEventListener('input', ()=>{
+        const ex = state.activeSession.exercises.find(x=>x.id === inp.dataset.exId);
+        if(!ex) return;
+        ex.cardio[inp.dataset.field] = inp.value;
+        save();
+      });
+    });
+    gridEl.querySelectorAll('[data-notes-ex]').forEach(ta=>{
+      ta.addEventListener('input', ()=>{
+        const ex = state.activeSession.exercises.find(x=>x.id === ta.dataset.notesEx);
+        if(!ex) return;
+        ex.notes = ta.value;
+        save();
+      });
+    });
+  }
+
+  document.getElementById('btnAddExerciseToSession').addEventListener('click', ()=>{
+    exercisePickerContext = 'session';
+    openExercisePicker();
+  });
+
+  // ---------- Programs ----------
+  function renderProgramsList(){
+    const listEl = document.getElementById('programsList');
+    const emptyNote = document.getElementById('programsEmptyNote');
+    if(state.programs.length === 0){
+      emptyNote.style.display = 'block';
+      listEl.innerHTML = '';
+      return;
+    }
+    emptyNote.style.display = 'none';
+    listEl.innerHTML = state.programs.map(p=>
+      '<div class="program-card"><div class="program-card-head">'
+      + '<div><div class="program-name">'+p.name+'</div><div class="program-sub">'+p.exercises.length+' exercise'+(p.exercises.length===1?'':'s')+'</div></div>'
+      + '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">'
+      +   '<button class="start-btn" data-start-program="'+p.id+'">Start</button>'
+      +   '<button class="set-del" data-delete-program="'+p.id+'" style="font-size:11px;">Delete</button>'
+      + '</div></div></div>'
+    ).join('');
+    listEl.querySelectorAll('[data-start-program]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const prog = state.programs.find(x=>x.id === btn.dataset.startProgram);
+        if(prog) startSession(prog);
+      });
+    });
+    listEl.querySelectorAll('[data-delete-program]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(confirm('Delete this program?')){
+          state.programs = state.programs.filter(x=>x.id !== btn.dataset.deleteProgram);
+          save();
+          renderProgramsList();
+        }
+      });
+    });
+  }
+
+  function renderWorkouts(){
+    renderProgramsList();
+    const banner = document.getElementById('resumeBanner');
+    if(state.activeSession){
+      banner.style.display = 'flex';
+      const n = state.activeSession.exercises.length;
+      document.getElementById('resumeBannerText').textContent = (state.activeSession.programName || 'Freestyle Workout') + ' — ' + n + ' exercise' + (n===1?'':'s') + ' in progress';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  const programModal = document.getElementById('programModal');
+  document.getElementById('btnNewProgram').addEventListener('click', ()=>{
+    programBuilderExercises = [];
+    document.getElementById('programNameInput').value = '';
+    renderProgramBuilderList();
+    programModal.classList.add('open');
+  });
+  document.getElementById('programModalCancel').addEventListener('click', ()=> programModal.classList.remove('open'));
+  document.getElementById('programModalSave').addEventListener('click', ()=>{
+    const name = document.getElementById('programNameInput').value.trim();
+    if(!name){ alert('Give your program a name.'); return; }
+    if(programBuilderExercises.length === 0){ alert('Add at least one exercise.'); return; }
+    state.programs.push({ id: uid(), name, exercises: programBuilderExercises.slice() });
+    save();
+    programModal.classList.remove('open');
+    renderProgramsList();
+  });
+
+  function renderProgramBuilderList(){
+    const container = document.getElementById('programExerciseList');
+    container.innerHTML = programBuilderExercises.map((e,i)=>
+      '<div class="set-row"><span style="flex:1; font-size:13px; color:var(--navy); font-weight:600;">'+e.name+'</span>'
+      + '<span class="type-chip '+e.type+'">'+e.type+'</span>'
+      + '<button class="set-del" data-remove-prog-ex="'+i+'">✕</button></div>'
+    ).join('') || '<div class="empty-note" style="padding:10px;">No exercises added yet.</div>';
+    container.querySelectorAll('[data-remove-prog-ex]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        programBuilderExercises.splice(parseInt(btn.dataset.removeProgEx,10),1);
+        renderProgramBuilderList();
+      });
+    });
+  }
+
+  document.getElementById('btnAddExerciseToProgram').addEventListener('click', ()=>{
+    exercisePickerContext = 'program';
+    openExercisePicker();
+  });
+
+  // ---------- Exercise picker (shared by session + program builder) ----------
+  const exercisePickerModal = document.getElementById('exercisePickerModal');
+  function openExercisePicker(){
+    document.getElementById('exercisePickerName').value = '';
+    document.querySelectorAll('#exercisePickerType .seg-btn').forEach((b,i)=> b.classList.toggle('active', i===0));
+    exercisePickerModal.classList.add('open');
+  }
+  document.querySelectorAll('#exercisePickerType .seg-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#exercisePickerType .seg-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+  document.getElementById('exercisePickerCancel').addEventListener('click', ()=> exercisePickerModal.classList.remove('open'));
+  document.getElementById('exercisePickerAdd').addEventListener('click', ()=>{
+    const name = document.getElementById('exercisePickerName').value.trim();
+    if(!name){ alert('Enter an exercise name.'); return; }
+    const activeType = document.querySelector('#exercisePickerType .seg-btn.active');
+    const type = activeType ? activeType.dataset.type : 'strength';
+    if(exercisePickerContext === 'program'){
+      programBuilderExercises.push({ id: uid(), name, type });
+      renderProgramBuilderList();
+    } else {
+      state.activeSession.exercises.push(cloneExerciseForSession({ name, type }));
+      save();
+      renderSessionExercises();
+    }
+    exercisePickerModal.classList.remove('open');
+  });
+
+  // ---------- History ----------
+  function renderHistory(){
+    const prGrid = document.getElementById('prGrid');
+    const prEmpty = document.getElementById('prEmptyNote');
+    const prKeys = Object.keys(state.prs);
+    if(prKeys.length === 0){
+      prEmpty.style.display = 'block';
+      prGrid.innerHTML = '';
+    } else {
+      prEmpty.style.display = 'none';
+      prGrid.innerHTML = prKeys.map(k=>{
+        const pr = state.prs[k];
+        let valueText = '';
+        if(pr.type === 'strength') valueText = pr.weightKg+'kg × '+pr.reps;
+        else if(pr.type === 'cardio'){
+          valueText = pr.durationMin+' min';
+          if(pr.distanceKm) valueText += ' · '+pr.distanceKm+'km';
+          if(pr.calories) valueText += ' · '+pr.calories+' cal';
+        } else if(pr.type === 'core'){
+          valueText = pr.metric === 'reps' ? pr.reps+' reps' : pr.holdSec+'s hold';
+        }
+        return '<div class="pr-row"><span class="pr-name">'+pr.name+'</span><span class="pr-value">'+valueText+'</span></div>';
+      }).join('');
+    }
+
+    const historyList = document.getElementById('historyList');
+    const historyEmpty = document.getElementById('historyEmptyNote');
+    const sorted = state.workoutHistory.slice().sort((a,b)=> b.date.localeCompare(a.date));
+    if(sorted.length === 0){
+      historyEmpty.style.display = 'block';
+      historyList.innerHTML = '';
+      return;
+    }
+    historyEmpty.style.display = 'none';
+    historyList.innerHTML = sorted.map(session=>{
+      const isOpen = openHistoryId === session.id;
+      const exLines = session.exercises.map(ex=>{
+        let summary = '';
+        if(ex.type === 'strength'){
+          summary = ex.sets.map(s=> (s.weightKg||0)+'kg×'+(s.reps||0)).join(', ') || 'No sets logged';
+        } else if(ex.type === 'cardio'){
+          summary = (ex.cardio.durationMin||0)+' min';
+          if(ex.cardio.distanceKm) summary += ' · '+ex.cardio.distanceKm+'km';
+          if(ex.cardio.calories) summary += ' · '+ex.cardio.calories+' cal';
+        } else if(ex.type === 'core'){
+          summary = ex.sets.map(s=>{
+            const parts = [];
+            if(s.reps) parts.push(s.reps+' reps');
+            if(s.holdSec) parts.push(s.holdSec+'s');
+            return parts.join(' / ');
+          }).filter(Boolean).join(', ') || 'No sets logged';
+        }
+        return '<div class="ex-line"><strong>'+ex.name+'</strong> <span class="type-chip '+ex.type+'" style="margin-left:6px;">'+ex.type+'</span><br>'+summary+(ex.notes ? '<br><em>'+ex.notes+'</em>' : '')+'</div>';
+      }).join('');
+      return '<div class="history-card">'
+        + '<div class="history-head" data-history-id="'+session.id+'">'
+        +   '<div><div class="history-title">'+(session.programName||'Freestyle Workout')+'</div><div class="history-sub">'+session.date+' · '+session.exercises.length+' exercise'+(session.exercises.length===1?'':'s')+'</div></div>'
+        +   '<div class="recipe-chevron">'+(isOpen?'▾':'▸')+'</div>'
+        + '</div>'
+        + '<div class="history-detail'+(isOpen?' open':'')+'">'+exLines
+        +   '<button class="l-del" data-delete-history="'+session.id+'" style="margin-top:8px;">Delete this workout</button>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+
+    historyList.querySelectorAll('[data-history-id]').forEach(head=>{
+      head.addEventListener('click', ()=>{
+        const id = head.dataset.historyId;
+        openHistoryId = openHistoryId === id ? null : id;
+        renderHistory();
+      });
+    });
+    historyList.querySelectorAll('[data-delete-history]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        if(confirm('Delete this workout from history? PRs will be recalculated.')){
+          state.workoutHistory = state.workoutHistory.filter(x=>x.id !== btn.dataset.deleteHistory);
+          recomputeAllPRs();
+          save();
+          renderHistory();
+        }
+      });
+    });
+  }
+
+  // ================= PROGRESS PHOTOS =================
+  const PHOTO_ANGLES = ['front','side','back'];
+  let compareAngle = 'front';
+
+  document.getElementById('photoDateInput').valueAsDate = new Date();
+
+  function compressImageFile(file, callback){
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxDim = 800;
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+        else if(h >= w && h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL('image/jpeg', 0.6));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function getPhotosForDate(date){
+    if(!state.progressPhotos[date]) state.progressPhotos[date] = { front:null, side:null, back:null };
+    return state.progressPhotos[date];
+  }
+
+  function renderPhotoSlots(){
+    const date = document.getElementById('photoDateInput').value || todayStr();
+    const photos = getPhotosForDate(date);
+    const container = document.getElementById('photoSlots');
+    container.innerHTML = PHOTO_ANGLES.map(angle=>{
+      const src = photos[angle];
+      return '<div class="photo-slot" data-angle="'+angle+'">'
+        + '<span class="slot-label">'+angle+'</span>'
+        + (src ? '<img src="'+src+'"><button class="slot-remove" data-remove-angle="'+angle+'">✕</button>' : '<span class="slot-placeholder">+</span>')
+        + '</div>';
+    }).join('');
+
+    container.querySelectorAll('.photo-slot').forEach(slot=>{
+      slot.addEventListener('click', (e)=>{
+        if(e.target.closest('.slot-remove')) return;
+        const angle = slot.dataset.angle;
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = ()=>{
+          if(!input.files || !input.files[0]) return;
+          compressImageFile(input.files[0], (dataUrl)=>{
+            getPhotosForDate(date)[angle] = dataUrl;
+            save();
+            renderPhotoSlots();
+            renderCompareDateOptions();
+            renderPhotoDatesList();
+          });
+        };
+        input.click();
+      });
+    });
+    container.querySelectorAll('[data-remove-angle]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        getPhotosForDate(date)[btn.dataset.removeAngle] = null;
+        save();
+        renderPhotoSlots();
+        renderCompareDateOptions();
+        renderPhotoDatesList();
+      });
+    });
+  }
+  document.getElementById('photoDateInput').addEventListener('change', renderPhotoSlots);
+
+  function getDatesWithPhotos(){
+    return Object.keys(state.progressPhotos)
+      .filter(d=> PHOTO_ANGLES.some(a=> state.progressPhotos[d][a]))
+      .sort((a,b)=> b.localeCompare(a));
+  }
+
+  document.querySelectorAll('#compareAngleTabs .seg-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#compareAngleTabs .seg-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      compareAngle = btn.dataset.angle;
+      renderComparePhotos();
+    });
+  });
+
+  function renderCompareDateOptions(){
+    const dates = getDatesWithPhotos();
+    const emptyNote = document.getElementById('compareEmptyNote');
+    const selA = document.getElementById('compareDateA');
+    const selB = document.getElementById('compareDateB');
+    if(dates.length === 0){
+      emptyNote.style.display = 'block';
+      selA.innerHTML = ''; selB.innerHTML = '';
+      renderComparePhotos();
+      return;
+    }
+    emptyNote.style.display = 'none';
+    const optionsHtml = dates.map(d=> '<option value="'+d+'">'+d+'</option>').join('');
+    const prevA = selA.value, prevB = selB.value;
+    selA.innerHTML = optionsHtml;
+    selB.innerHTML = optionsHtml;
+    selA.value = dates.includes(prevA) ? prevA : dates[0];
+    selB.value = dates.includes(prevB) ? prevB : (dates[1] || dates[0]);
+    renderComparePhotos();
+  }
+  document.getElementById('compareDateA').addEventListener('change', renderComparePhotos);
+  document.getElementById('compareDateB').addEventListener('change', renderComparePhotos);
+
+  function renderComparePhotos(){
+    const dateA = document.getElementById('compareDateA').value;
+    const dateB = document.getElementById('compareDateB').value;
+    const slotA = document.getElementById('comparePhotoA');
+    const slotB = document.getElementById('comparePhotoB');
+    const photoA = dateA && state.progressPhotos[dateA] ? state.progressPhotos[dateA][compareAngle] : null;
+    const photoB = dateB && state.progressPhotos[dateB] ? state.progressPhotos[dateB][compareAngle] : null;
+    slotA.innerHTML = photoA ? '<img src="'+photoA+'">' : '<span class="empty-note">No photo</span>';
+    slotB.innerHTML = photoB ? '<img src="'+photoB+'">' : '<span class="empty-note">No photo</span>';
+  }
+
+  function renderPhotoDatesList(){
+    const dates = getDatesWithPhotos();
+    const listEl = document.getElementById('photoDatesList');
+    const emptyNote = document.getElementById('photoDatesEmptyNote');
+    if(dates.length === 0){
+      emptyNote.style.display = 'block';
+      listEl.innerHTML = '';
+      return;
+    }
+    emptyNote.style.display = 'none';
+    listEl.innerHTML = dates.map(d=>{
+      const p = state.progressPhotos[d];
+      const thumbs = PHOTO_ANGLES.map(a=> p[a] ? '<div class="mini-thumb"><img src="'+p[a]+'"></div>' : '<div class="mini-thumb"></div>').join('');
+      return '<div class="photo-date-row"><span class="photo-date-label">'+d+'</span><div class="photo-date-thumbs">'+thumbs+'</div><button class="l-del" data-delete-photo-date="'+d+'">remove</button></div>';
+    }).join('');
+    listEl.querySelectorAll('[data-delete-photo-date]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(confirm('Delete all photos for this date?')){
+          delete state.progressPhotos[btn.dataset.deletePhotoDate];
+          save();
+          renderPhotoSlots();
+          renderCompareDateOptions();
+          renderPhotoDatesList();
+        }
+      });
+    });
+  }
+
+  function renderPhotosSection(){
+    renderPhotoSlots();
+    renderCompareDateOptions();
+    renderPhotoDatesList();
+  }
+
+  // Safety net: force-save if the screen locks or tab is backgrounded mid-workout.
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'hidden') save();
+  });
+  document.querySelectorAll('#nutritionSubnav .source-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#nutritionSubnav .source-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const isLog = btn.dataset.sub === 'log';
+      document.getElementById('nutritionLogView').style.display = isLog ? 'block' : 'none';
+      document.getElementById('nutritionLibraryView').style.display = isLog ? 'none' : 'block';
+    });
+  });
+
+  // ---------- Stats setup ----------
+  document.querySelectorAll('#setupActivity .seg-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#setupActivity .seg-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  function showStatsSetup(prefill){
+    const card = document.getElementById('statsSetupCard');
+    card.style.display = 'block';
+    const s = state.settings.statsSetup;
+    document.getElementById('setupWeight').value = prefill && s.weightKg ? s.weightKg : (getLatestWeight() || '');
+    document.getElementById('setupGoalWeight').value = prefill && s.goalWeightKg ? s.goalWeightKg : '';
+    document.querySelectorAll('#setupActivity .seg-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.level === (s.activityLevel || 'moderate'));
+    });
+  }
+
+  function getLatestWeight(){
+    const log = state.weightLog.slice().sort((a,b)=> a.date.localeCompare(b.date));
+    return log.length ? log[log.length-1].kg : null;
+  }
+
+  document.getElementById('btnCalculateTargets').addEventListener('click', ()=>{
+    const weightKg = parseFloat(document.getElementById('setupWeight').value);
+    const goalWeightKg = parseFloat(document.getElementById('setupGoalWeight').value);
+    const activeBtn = document.querySelector('#setupActivity .seg-btn.active');
+    const activityLevel = activeBtn ? activeBtn.dataset.level : 'moderate';
+    if(isNaN(weightKg) || weightKg <= 0){
+      alert('Enter a current weight to calculate targets.');
+      return;
+    }
+    const computed = computeTargetsFromStats(weightKg, activityLevel);
+    state.settings.targets.standard = computed.standard;
+    state.settings.targets.keto = computed.keto;
+    state.settings.statsSetup = {
+      done: true,
+      weightKg: weightKg,
+      goalWeightKg: isNaN(goalWeightKg) ? null : goalWeightKg,
+      activityLevel: activityLevel
+    };
+    save();
+    document.getElementById('statsSetupCard').style.display = 'none';
+    renderDashboard();
+    renderNutrition();
+  });
+
+  document.getElementById('btnRecalcTargets').addEventListener('click', ()=>{
+    const card = document.getElementById('statsSetupCard');
+    const isOpen = card.style.display === 'block';
+    if(isOpen){ card.style.display = 'none'; } else { showStatsSetup(true); }
+  });
+
+  // ---------- Meal library ----------
+  let mealSource = 'Fuel Up';
+  let mealCategory = 'All';
+  let openRecipeId = null;
+
+  document.querySelectorAll('#sourceTabs .source-tab').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#sourceTabs .source-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      mealSource = btn.dataset.source;
+      mealCategory = 'All';
+      openRecipeId = null;
+      renderMealLibrary();
+    });
+  });
+
+  function getCategoriesForSource(source){
+    const cats = [];
+    MEAL_LIBRARY.forEach(r=>{
+      if(r.source === source && cats.indexOf(r.category) === -1) cats.push(r.category);
+    });
+    return cats;
+  }
+
+  function renderMealLibrary(){
+    const cats = getCategoriesForSource(mealSource);
+    const chipsEl = document.getElementById('catChips');
+    chipsEl.innerHTML = ['All'].concat(cats).map(c=>
+      '<button class="cat-chip'+(mealCategory===c?' active':'')+'" data-cat="'+c+'">'+c+'</button>'
+    ).join('');
+    chipsEl.querySelectorAll('.cat-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        mealCategory = chip.dataset.cat;
+        openRecipeId = null;
+        renderMealLibrary();
+      });
+    });
+
+    const filtered = MEAL_LIBRARY.filter(r=> r.source === mealSource && (mealCategory === 'All' || r.category === mealCategory));
+    const gridEl = document.getElementById('recipeGrid');
+    gridEl.innerHTML = filtered.map(r=>{
+      const isOpen = openRecipeId === r.id;
+      const pills = [
+        r.kcal != null ? r.kcal+' kcal' : null,
+        r.protein != null ? r.protein+'g protein' : null,
+        r.carbs != null ? r.carbs+'g carbs' : null,
+        r.fat != null ? r.fat+'g fat' : null
+      ].filter(Boolean).map(p=>'<span class="recipe-pill">'+p+'</span>').join('');
+      const ingHtml = r.ingredients && r.ingredients.length
+        ? '<h4>Ingredients</h4><ul>'+r.ingredients.map(i=>'<li>'+i+'</li>').join('')+'</ul>' : '';
+      const methodHtml = r.method && r.method.length
+        ? '<h4>Method</h4><ul>'+r.method.map(s=>'<li>'+s+'</li>').join('')+'</ul>' : '';
+      const noteHtml = r.note ? '<div class="recipe-note">'+r.note+'</div>' : '';
+      return '<div class="recipe-card">'
+        + '<div class="recipe-head" data-id="'+r.id+'">'
+        +   '<div><div class="recipe-name">'+r.name+'</div><div class="recipe-macropills">'+pills+'</div></div>'
+        +   '<div class="recipe-chevron">'+(isOpen?'▾':'▸')+'</div>'
+        + '</div>'
+        + '<div class="recipe-detail'+(isOpen?' open':'')+'">'
+        +   ingHtml + methodHtml + noteHtml
+        +   '<button class="log-this-btn" data-log-id="'+r.id+'">+ Log this</button>'
+        + '</div>'
+      + '</div>';
+    }).join('') || '<div class="empty-note">No recipes in this category yet.</div>';
+
+    gridEl.querySelectorAll('.recipe-head').forEach(head=>{
+      head.addEventListener('click', ()=>{
+        const id = head.dataset.id;
+        openRecipeId = openRecipeId === id ? null : id;
+        renderMealLibrary();
+      });
+    });
+    gridEl.querySelectorAll('.log-this-btn').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        logRecipe(btn.dataset.logId);
+      });
+    });
+  }
+
+  function logRecipe(id){
+    const r = MEAL_LIBRARY.find(x=>x.id === id);
+    if(!r) return;
+    const n = getTodayNutrition();
+    n.entries.push({
+      id: Date.now().toString(36),
+      name: r.name,
+      cal: r.kcal || 0,
+      protein: r.protein || 0,
+      carbs: r.carbs || 0,
+      fat: r.fat || 0,
+      fibre: r.fibre || 0
+    });
+    save();
+    renderDashboard();
+    renderNutrition();
+  }
+
+  // ---------- Nutrition tab render ----------
+  function renderNutrition(){
+    document.getElementById('statsSetupCard').style.display = state.settings.statsSetup.done ? 'none' : 'block';
+    if(!state.settings.statsSetup.done) showStatsSetup(false);
+
+    const totals = getTodayTotals();
+    const targets = getActiveTargets();
+    renderNutritionSummary('calProgress2','calTarget2','calFill2','proteinVal2','proteinBar2','carbsVal2','carbsBar2','fatVal2','fatBar2','fibreVal2','fibreBar2', totals, targets);
+    renderMealLibrary();
+
+    const n = getTodayNutrition();
+    const listEl = document.getElementById('foodLogList');
+    const emptyNote = document.getElementById('foodEmptyNote');
+    listEl.innerHTML = '';
+    if(n.entries.length === 0){
+      emptyNote.style.display = 'block';
+    } else {
+      emptyNote.style.display = 'none';
+      n.entries.slice().reverse().forEach(entry=>{
+        const li = document.createElement('li');
+        li.innerHTML = '<span><span class="food-name">'+entry.name+'</span><span class="food-macros">'+entry.cal+' kcal · P'+entry.protein+' C'+entry.carbs+' F'+entry.fat+' Fib'+entry.fibre+'</span></span><button class="l-del" data-id="'+entry.id+'">remove</button>';
+        listEl.appendChild(li);
+      });
+      listEl.querySelectorAll('.l-del').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const id = e.target.dataset.id;
+          n.entries = n.entries.filter(x=>x.id !== id);
+          save();
+          renderDashboard();
+          renderNutrition();
+        });
+      });
+    }
+  }
+
+  // ---------- init ----------
+  renderHeaderAndGreeting();
+  renderDashboard();
+})();
+</script>
+
+</body>
+</html>
